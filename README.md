@@ -6,3 +6,7 @@ To use you must first download the dataset, it is easiest to git clone the follo
 git clone https://github.com/jhpohovey/StanfordCars-Dataset.git
 
 ```
+
+# Timeline
+- be done with coding by 5th December latest
+- use the last week to write the report
