@@ -40,6 +40,8 @@ jobs:
           root_file: report.tex
           # *** CHANGED: Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup) ***
           compiler: xelatex
+          # ADDED: Explicitly pass a standard argument to override the action's tendency to inject incompatible flags like '-pdf'
+          args: -interaction=nonstopmode
           
       - name: Upload PDF Artifact
         # Action to save the resulting PDF as a downloadable artifact
