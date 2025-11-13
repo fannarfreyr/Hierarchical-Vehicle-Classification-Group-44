@@ -6,10 +6,18 @@ on:
     branches:
       - main
       - master
+    # *** UPDATED: Restrict execution to only run if files in the src/ folder change ***
+    paths:
+      - 'src/**'
+      - '.github/workflows/latex.yml'
   pull_request:
     branches:
       - main
       - master
+    # *** UPDATED: Restrict execution to only run if files in the src/ folder change ***
+    paths:
+      - 'src/**'
+      - '.github/workflows/latex.yml'
   # Allows you to manually trigger the workflow from the Actions tab in GitHub
   workflow_dispatch:
 
@@ -36,11 +44,11 @@ jobs:
         # Use the dedicated xu-cheng/latex-action for compilation
         uses: xu-cheng/latex-action@v2
         with:
-          # Specify the main file to compile
-          root_file: report.tex
-          # *** CHANGED: Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup) ***
+          # *** UPDATED: Specify the main file inside the src/ folder ***
+          root_file: src/report.tex
+          # Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup)
           compiler: xelatex
-          # ADDED: Explicitly pass a standard argument to override the action's tendency to inject incompatible flags like '-pdf'
+          # Explicitly pass a standard argument to override the action's tendency to inject incompatible flags like '-pdf'
           args: -interaction=nonstopmode
           
       - name: Upload PDF Artifact
@@ -48,7 +56,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Deep-Learning-Report-PDF
-          # The path to the compiled file (output name matches root_file name)
-          path: report.pdf
+          # *** UPDATED: The compiled PDF will be in the src/ folder ***
+          path: src/report.pdf
           # Keep the artifact available for 7 days
           retention-days: 7
