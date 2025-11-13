@@ -1,4 +1,3 @@
-# This workflow will run every time you push to the main branch or create a Pull Request.
 name: LaTeX PDF Generation
 
 on:
@@ -42,7 +41,8 @@ jobs:
         # Use the dedicated xu-cheng/latex-action for compilation
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: report-src/report.tex
+          working_directory: report-src/
+          root_file: report.tex
           # Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup)
           compiler: xelatex
           # Explicitly pass a standard argument to override the action's tendency to inject incompatible flags like '-pdf'
@@ -53,6 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Deep-Learning-Report-PDF
+          # The compiled PDF will be in the report-src/ folder
           path: report-src/report.pdf
           # Keep the artifact available for 7 days
           retention-days: 7
