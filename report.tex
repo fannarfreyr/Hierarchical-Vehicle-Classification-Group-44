@@ -1,72 +1,198 @@
-\documentclass[11pt, a4paper]{article}
+\documentclass{article}
 
-% --- UNIVERSAL PREAMBLE BLOCK ---
-% Set standard academic margins
-\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
-% Required for modern font handling
-\usepackage{fontspec}
 
-% Setup language (English is the default)
-\usepackage[english, bidi=basic, provide=*]{babel}
-\babelprovide[import, onchar=ids fonts]{english}
 
-% Set default font to Serif for an academic tone (using Noto Serif which is available in the compiler)
-\babelfont{rm}{Noto Serif}
+\usepackage{arxiv}
 
-% Required for advanced math environments (equations, matrices)
-\usepackage{amsmath}
-% Required for high-quality table formatting (toprule, midrule, bottomrule)
-\usepackage{booktabs}
-% Required for links in the final PDF
-\usepackage{hyperref}
-% --- END UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}		% Can be removed after putting your text content
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{doi}
 
-\title{Deep Learning Project Report: Semantic Segmentation with CNNs}
-\author{Your Name(s) / Team Name}
-\date{\today}
+
+
+\title{A template for the \emph{arxiv} style}
+
+%\date{September 9, 1985}	% Here you can change the date presented in the paper title
+%\date{} 					% Or removing it
+
+\author{ \href{https://orcid.org/0000-0000-0000-0000}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}David S.~Hippocampus}\thanks{Use footnote for providing further
+		information about author (webpage, alternative
+		address)---\emph{not} for acknowledging funding agencies.} \\
+	Department of Computer Science\\
+	Cranberry-Lemon University\\
+	Pittsburgh, PA 15213 \\
+	\texttt{hippo@cs.cranberry-lemon.edu} \\
+	%% examples of more authors
+	\And
+	\href{https://orcid.org/0000-0000-0000-0000}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}Elias D.~Striatum} \\
+	Department of Electrical Engineering\\
+	Mount-Sheikh University\\
+	Santa Narimana, Levand \\
+	\texttt{stariate@ee.mount-sheikh.edu} \\
+	%% \AND
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+	%% \And
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+	%% \And
+	%% Coauthor \\
+	%% Affiliation \\
+	%% Address \\
+	%% \texttt{email} \\
+}
+
+% Uncomment to remove the date
+%\date{}
+
+% Uncomment to override  the `A preprint' in the header
+%\renewcommand{\headeright}{Technical Report}
+%\renewcommand{\undertitle}{Technical Report}
+\renewcommand{\shorttitle}{\textit{arXiv} Template}
+
+%%% Add PDF metadata to help others organize their library
+%%% Once the PDF is generated, you can check the metadata with
+%%% $ pdfinfo template.pdf
+\hypersetup{
+pdftitle={A template for the arxiv style},
+pdfsubject={q-bio.NC, q-bio.QM},
+pdfauthor={David S.~Hippocampus, Elias D.~Striatum},
+pdfkeywords={First keyword, Second keyword, More},
+}
 
 \begin{document}
-
 \maketitle
 
 \begin{abstract}
-This report details the implementation and evaluation of a Convolutional Neural Network (CNN) designed for the task of semantic image segmentation. The network, based on a modified U-Net architecture, was trained on a relevant dataset. Our experimental results show a competitive performance, demonstrating the model's efficacy for dense prediction tasks.
+	\lipsum[1]
 \end{abstract}
 
+
+% keywords can be removed
+\keywords{First keyword \and Second keyword \and More}
+
+
 \section{Introduction}
-Deep learning has shown remarkable success in computer vision. Specifically, the task of \textbf{semantic segmentation}, which assigns a class label to every pixel, is crucial for applications like autonomous navigation and medical diagnostics. This project focuses on designing and optimizing a segmentation model.
+\lipsum[2]
+\lipsum[3]
 
-\section{Methodology}
-\subsection{Model Architecture}
-We utilize the U-Net architecture, known for its encoder-decoder structure and skip connections. The encoder gradually reduces spatial dimensions while increasing feature depth, and the decoder reconstructs the segmentation mask.
 
-\subsection{Loss Function}
-The training process uses the combined Dice-Jaccard loss. The Dice coefficient ($D$) is commonly used for imbalanced segmentation tasks:
-$$
-D = \frac{2 |P \cap G|}{|P| + |G|}
-$$
-The final loss function is derived from the Jaccard Index (IoU), which is related to the Dice coefficient, and is optimized using the Adam optimizer.
+\section{Headings: first level}
+\label{sec:headings}
 
-\section{Results and Discussion}
-The model was trained for 50 epochs. Performance was measured using the Mean Intersection over Union (mIoU).
+\lipsum[4] See Section \ref{sec:headings}.
 
-\begin{table}[htbp]
-    \centering
-    \caption{Key Segmentation Performance Metrics}
-    \label{tab:results}
-    \begin{tabular}{lcc}
-        \toprule
-        Metric & Value & Baseline Benchmark \\
-        \midrule
-        mIoU (\%) & $78.5$ & $80.2$ \\
-        Pixel Accuracy (\%) & $95.1$ & $96.0$ \\
-        \bottomrule
-    \end{tabular}
+\subsection{Headings: second level}
+\lipsum[5]
+\begin{equation}
+	\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
+\end{equation}
+
+\subsubsection{Headings: third level}
+\lipsum[6]
+
+\paragraph{Paragraph}
+\lipsum[7]
+
+
+
+\section{Examples of citations, figures, tables, references}
+\label{sec:others}
+
+\subsection{Citations}
+Citations use \verb+natbib+. The documentation may be found at
+\begin{center}
+	\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
+\end{center}
+
+Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
+
+\subsection{Figures}
+\lipsum[10]
+See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
+\lipsum[11]
+
+\begin{figure}
+	\centering
+	\fbox{\rule[-.5cm]{4cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+	\caption{Sample figure caption.}
+	\label{fig:fig1}
+\end{figure}
+
+\subsection{Tables}
+See awesome Table~\ref{tab:table}.
+
+The documentation for \verb+booktabs+ (`Publication quality tables in LaTeX') is available from:
+\begin{center}
+	\url{https://www.ctan.org/pkg/booktabs}
+\end{center}
+
+
+\begin{table}
+	\caption{Sample table title}
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\multicolumn{2}{c}{Part}                   \\
+		\cmidrule(r){1-2}
+		Name     & Description     & Size ($\mu$m) \\
+		\midrule
+		Dendrite & Input terminal  & $\sim$100     \\
+		Axon     & Output terminal & $\sim$10      \\
+		Soma     & Cell body       & up to $10^6$  \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:table}
 \end{table}
 
-Our achieved mIoU of $78.5\%$ is robust, considering the complexity of the dataset.
+\subsection{Lists}
+\begin{itemize}
+	\item Lorem ipsum dolor sit amet
+	\item consectetur adipiscing elit.
+	\item Aliquam dignissim blandit est, in dictum tortor gravida eget. In ac rutrum magna.
+\end{itemize}
 
-\section{Conclusion}
-The deep learning model successfully addresses the semantic segmentation task. Future work will focus on integrating self-attention mechanisms to improve boundary precision.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
+
+
+%%% Uncomment this section and comment out the \bibliography{references} line above to use inline references.
+% \begin{thebibliography}{1}
+
+% 	\bibitem{kour2014real}
+% 	George Kour and Raid Saabne.
+% 	\newblock Real-time segmentation of on-line handwritten arabic script.
+% 	\newblock In {\em Frontiers in Handwriting Recognition (ICFHR), 2014 14th
+% 			International Conference on}, pages 417--422. IEEE, 2014.
+
+% 	\bibitem{kour2014fast}
+% 	George Kour and Raid Saabne.
+% 	\newblock Fast classification of handwritten on-line arabic characters.
+% 	\newblock In {\em Soft Computing and Pattern Recognition (SoCPaR), 2014 6th
+% 			International Conference of}, pages 312--318. IEEE, 2014.
+
+% 	\bibitem{hadash2018estimate}
+% 	Guy Hadash, Einat Kermany, Boaz Carmeli, Ofer Lavi, George Kour, and Alon
+% 	Jacovi.
+% 	\newblock Estimate and replace: A novel approach to integrating deep neural
+% 	networks with existing applications.
+% 	\newblock {\em arXiv preprint arXiv:1804.09028}, 2018.
+
+% \end{thebibliography}
+
 
 \end{document}
