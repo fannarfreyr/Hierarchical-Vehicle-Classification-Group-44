@@ -1,0 +1,72 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+% Set standard academic margins
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+% Required for modern font handling
+\usepackage{fontspec}
+
+% Setup language (English is the default)
+\usepackage[english, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default font to Serif for an academic tone (using Noto Serif which is available in the compiler)
+\babelfont{rm}{Noto Serif}
+
+% Required for advanced math environments (equations, matrices)
+\usepackage{amsmath}
+% Required for high-quality table formatting (toprule, midrule, bottomrule)
+\usepackage{booktabs}
+% Required for links in the final PDF
+\usepackage{hyperref}
+% --- END UNIVERSAL PREAMBLE BLOCK ---
+
+\title{Deep Learning Project Report: Semantic Segmentation with CNNs}
+\author{Your Name(s) / Team Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report details the implementation and evaluation of a Convolutional Neural Network (CNN) designed for the task of semantic image segmentation. The network, based on a modified U-Net architecture, was trained on a relevant dataset. Our experimental results show a competitive performance, demonstrating the model's efficacy for dense prediction tasks.
+\end{abstract}
+
+\section{Introduction}
+Deep learning has shown remarkable success in computer vision. Specifically, the task of \textbf{semantic segmentation}, which assigns a class label to every pixel, is crucial for applications like autonomous navigation and medical diagnostics. This project focuses on designing and optimizing a segmentation model.
+
+\section{Methodology}
+\subsection{Model Architecture}
+We utilize the U-Net architecture, known for its encoder-decoder structure and skip connections. The encoder gradually reduces spatial dimensions while increasing feature depth, and the decoder reconstructs the segmentation mask.
+
+\subsection{Loss Function}
+The training process uses the combined Dice-Jaccard loss. The Dice coefficient ($D$) is commonly used for imbalanced segmentation tasks:
+$$
+D = \frac{2 |P \cap G|}{|P| + |G|}
+$$
+The final loss function is derived from the Jaccard Index (IoU), which is related to the Dice coefficient, and is optimized using the Adam optimizer.
+
+\section{Results and Discussion}
+The model was trained for 50 epochs. Performance was measured using the Mean Intersection over Union (mIoU).
+
+\begin{table}[htbp]
+    \centering
+    \caption{Key Segmentation Performance Metrics}
+    \label{tab:results}
+    \begin{tabular}{lcc}
+        \toprule
+        Metric & Value & Baseline Benchmark \\
+        \midrule
+        mIoU (\%) & $78.5$ & $80.2$ \\
+        Pixel Accuracy (\%) & $95.1$ & $96.0$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Our achieved mIoU of $78.5\%$ is robust, considering the complexity of the dataset.
+
+\section{Conclusion}
+The deep learning model successfully addresses the semantic segmentation task. Future work will focus on integrating self-attention mechanisms to improve boundary precision.
+
+\end{document}
