@@ -22,14 +22,24 @@ jobs:
         # Action to check out the repository code
         uses: actions/checkout@v4
 
+      - name: Cache TeX Live Installation
+        # Use the official cache action
+        uses: actions/cache@v4
+        with:
+          # Define a cache key based on the runner OS and a hardcoded version number.
+          # Change 'v1' to 'v2', 'v3', etc., if you need to bust the cache (e.g., if you change packages).
+          key: ${{ runner.os }}-texlive-2024-v1
+          # The path where xu-cheng/latex-action installs TeX Live (important!)
+          path: ~/.cache/GHA-texlive
+
       - name: Compile LaTeX to PDF
         # Use the dedicated xu-cheng/latex-action for compilation
         uses: xu-cheng/latex-action@v2
         with:
           # Specify the main file to compile
           root_file: report.tex
-          # Use pdflatex, the standard compiler
-          compiler: pdflatex
+          # *** CHANGED: Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup) ***
+          compiler: xelatex
           
       - name: Upload PDF Artifact
         # Action to save the resulting PDF as a downloadable artifact
