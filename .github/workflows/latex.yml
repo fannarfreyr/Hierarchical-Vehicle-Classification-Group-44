@@ -8,7 +8,7 @@ on:
       - master
     # *** UPDATED: Restrict execution to only run if files in the src/ folder change ***
     paths:
-      - 'src/**'
+      - 'report-src/**'
       - '.github/workflows/latex.yml'
   pull_request:
     branches:
@@ -16,7 +16,7 @@ on:
       - master
     # *** UPDATED: Restrict execution to only run if files in the src/ folder change ***
     paths:
-      - 'src/**'
+      - 'report-src/**'
       - '.github/workflows/latex.yml'
   # Allows you to manually trigger the workflow from the Actions tab in GitHub
   workflow_dispatch:
@@ -45,7 +45,7 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           # *** UPDATED: Specify the main file inside the src/ folder ***
-          root_file: src/report.tex
+          root_file: report-src/report.tex
           # Switched to xelatex for better modern font compatibility (matching Overleaf's standard setup)
           compiler: xelatex
           # Explicitly pass a standard argument to override the action's tendency to inject incompatible flags like '-pdf'
