@@ -30,6 +30,10 @@ class ExperimentLogger:
         self.error = None
         self.extra_images = []
 
+        # NEW — storage for top-1 and top-5 accuracy
+        self.top1 = []
+        self.top5 = []
+
     # ----------------------------------------------------
     # BASIC INFO
     # ----------------------------------------------------
@@ -44,7 +48,6 @@ class ExperimentLogger:
     # SCALAR METRICS (TensorBoard-style)
     # ----------------------------------------------------
     def add_scalar(self, name, value, epoch=None):
-        """Store a single scalar metric."""
         if not self.active:
             return
 
@@ -65,7 +68,19 @@ class ExperimentLogger:
             return
 
         entry = {"epoch": epoch}
-        entry.update(kwargs)
+
+        # --- NEW: detect top1/top5 automatically
+        for key, value in kwargs.items():
+            key_lower = key.lower()
+
+            if "top1" in key_lower or "top_1" in key_lower:
+                self.top1.append(float(value))
+
+            elif "top5" in key_lower or "top_5" in key_lower:
+                self.top5.append(float(value))
+
+            entry[key] = value
+
         self.metrics.append(entry)
 
     # ----------------------------------------------------
@@ -93,9 +108,6 @@ class ExperimentLogger:
 
         os.makedirs("plots", exist_ok=True)
 
-        # Create timestamp: YYYYMMDD_HHMM
-        timestamp = datetime.datetime.now().strftime("%m%d_%H%M")
-
         # Tensor → NumPy
         if "torch" in str(type(image)):
             image = image.detach().cpu().numpy()
@@ -116,7 +128,6 @@ class ExperimentLogger:
 
         image = np.clip(image, 0, 1).astype(np.float32)
 
-        # SAVE with timestamp
         timestamp = datetime.datetime.now().strftime("%m_%d_%H_%M")
         filename = f"plots/{self.name}_{timestamp}_{name}.png"
         plt.imsave(filename, image)
@@ -129,15 +140,13 @@ class ExperimentLogger:
     # CONFUSION MATRIX
     # ----------------------------------------------------
     def add_confusion_matrix(self, cm, class_names, name="confusion_matrix"):
-    
-        fig, ax = plt.subplots(figsize=(18, 18))   # LARGE FIGURE
+        fig, ax = plt.subplots(figsize=(18, 18))
         im = ax.imshow(cm, cmap="Blues")
 
         fig.colorbar(im)
 
-        # Ticks every X classes (keeps the plot readable)
         n = len(class_names)
-        step = max(1, n // 25)   # Show ~25 tick labels max
+        step = max(1, n // 25)
 
         ax.set_xticks(np.arange(0, n, step))
         ax.set_yticks(np.arange(0, n, step))
@@ -153,14 +162,11 @@ class ExperimentLogger:
 
         plt.tight_layout()
 
-        # Save inside experiment folder
         timestamp = datetime.datetime.now().strftime("%m_%d_%H_%M")
         filename = f"plots/{self.name}_{timestamp}_{name}.png"
         fig.savefig(filename, dpi=300)
         plt.close(fig)
-
-
-        self.add_plot(fig, name)
+        self.extra_images.append(filename)
 
     # ----------------------------------------------------
     # ERROR CAPTURE
@@ -192,6 +198,7 @@ class ExperimentLogger:
         if self.reason:
             entry += f"### Reason\n{self.reason}\n\n"
 
+        # Metrics block
         if self.metrics:
             entry += "### Metrics\n"
             for m in self.metrics:
@@ -202,6 +209,15 @@ class ExperimentLogger:
                 else:
                     entry += f"- {m['metric']}: {m['value']}\n"
             entry += "\n"
+
+        # NEW — Top-1 and Top-5 sections
+        if self.top1:
+            entry += "### Top-1 Accuracy per Epoch\n"
+            entry += f"{self.top1}\n\n"
+
+        if self.top5:
+            entry += "### Top-5 Accuracy per Epoch\n"
+            entry += f"{self.top5}\n\n"
 
         if self.results:
             entry += f"### Results\n{self.results}\n\n"
