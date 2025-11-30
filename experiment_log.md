@@ -1181,11 +1181,13 @@ Training finished. Logged curves, confusion matrix, sample image.
 
 ---
 
-## Experiment: 3_heads_final_with_test_time_augmentation
+## Experiment: 3_heads_final_with_3_test_time_augmentation
 **Date:** 2025-11-28 13:12:08
 
 ## Changes
 No changes to the model architecture, however we did implement a TTA inference strategy
+Augmentations: horizontal flip, +15°, -15°
+
 
 ## Reason
 To measure model robustness
@@ -1206,3 +1208,53 @@ Test Set Size: 8041
 ----------------------------------------
 Make-Gap:  5.75%
 Type-Gap:  6.67%
+
+## Experiment: 3_heads_final_with_5_test_time_augmentation
+**Date:** 2025-11-28 13:12:08
+
+## Changes
+No changes to the model architecture, however we did implement a TTA inference strategy
+Augmentations: horizontal flip, +15°, -15°, +90°, -90°, 5 shear, -5 shear
+
+
+## Reason
+To measure model robustness
+
+## Results
+--- Starting Phase 8 (3-Head) Evaluation ---
+Test Set Size: 8041
+----------------------------------------
+1. Model Head Accuracy:    88.57% (The Hard Task)
+2. Type Head Accuracy:     95.29% (The Medium Task)
+3. Make Head Accuracy:     94.34% (The Easy Task)
+----------------------------------------
+4. Make-Model Consistency: 97.71% (Brand Matches Car)
+5. Type-Model Consistency: 96.98% (Type Matches Car)
+----------------------------------------
+Make-Gap:  5.77%
+Type-Gap:  6.72%
+
+## Experiment: 3_heads_final_with_11_test_time_augmentation
+**Date:** 2025-11-28 13:12:08
+
+## Changes
+No changes to the model architecture, however we did implement a TTA inference strategy
+Augmentations: horizontal flip, vertical flip, +15°, -15°, +90°, -90°, upside down, +5% zoom, -5% zoom, 5 shear, -5 shear
+
+
+## Reason
+To measure model robustness
+
+## Results
+--- Starting Phase 8 (3-Head) Evaluation ---
+Test Set Size: 8041
+----------------------------------------
+1. Model Head Accuracy:    87.25% (The Hard Task)
+2. Type Head Accuracy:     94.24% (The Medium Task)
+3. Make Head Accuracy:     93.28% (The Easy Task)
+----------------------------------------
+4. Make-Model Consistency: 96.93% (Brand Matches Car)
+5. Type-Model Consistency: 95.76% (Type Matches Car)
+----------------------------------------
+Make-Gap:  6.03%
+Type-Gap:  6.99%
