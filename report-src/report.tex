@@ -26,60 +26,29 @@
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
 %\date{} 					% Or removing it
 
-\author{ \href{https://orcid.org/0000-0000-0000-0000}{\hspace{1mm}David S.~Hippocampus}\thanks{Use footnote for providing further
-		information about author (webpage, alternative
-		address)---\emph{not} for acknowledging funding agencies.} \\
-	Department of Computer Science\\
-	Cranberry-Lemon University\\
-	Pittsburgh, PA 15213 \\
-	\texttt{hippo@cs.cranberry-lemon.edu} \\
-	%% examples of more authors
-	\And
-	\href{https://orcid.org/0000-0000-0000-0000}{\hspace{1mm}Elias D.~Striatum} \\
-	Department of Electrical Engineering\\
-	Mount-Sheikh University\\
-	Santa Narimana, Levand \\
-	\texttt{stariate@ee.mount-sheikh.edu} \\
-	%% \AND
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
-	%% \And
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
-	%% \And
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
+\hypersetup{
+pdftitle={Hierarchical Vehicle Classification with Multi-Task Learning},
+pdfsubject={Computer Science, Deep Learning, Classification},
+pdfauthor={Author One Name, Author Two Name, Author Three Name}, % Update these names
+pdfkeywords={Fine-Grained Classification, Multi-Task Learning, ResNet, Hierarchical Label Smoothing},
 }
 
-% Uncomment to remove the date
-%\date{}
+% --- TITLE AND AUTHORS ---
+\title{Hierarchical Vehicle Classification with Multi-Task Learning}
 
-% Uncomment to override  the `A preprint' in the header
-%\renewcommand{\headeright}{Technical Report}
-%\renewcommand{\undertitle}{Technical Report}
-\renewcommand{\shorttitle}{\textit{arXiv} Template}
-
-%%% Add PDF metadata to help others organize their library
-%%% Once the PDF is generated, you can check the metadata with
-%%% $ pdfinfo template.pdf
-\hypersetup{
-pdftitle={A template for the arxiv style},
-pdfsubject={q-bio.NC, q-bio.QM},
-pdfauthor={David S.~Hippocampus, Elias D.~Striatum},
-pdfkeywords={First keyword, Second keyword, More},
+\author{
+    Jónuson Fannar Freyr \thanks{Department of Computer Science, Aarhus University} \\
+    \and 
+    Jenrik Engels \footnotemark[1] \\
+    \and
+    András Szabolcs Gyüre \footnotemark[1]
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-	\lipsum[1]
+	This project investigates effective strategies for hierarchical image classification on the Stanford Cars Dataset, addressing the challenge of distinguishing between 196 visually similar car models. We utilize a ResNet-50 backbone and evaluate three distinct output designs: a flat single-head classifier, a two-head classifier, and a three-head Multi-Task Learning (MTL) architecture that independently predicts the vehicle's Make, Type, and Model. We demonstrate that the three-head design, specifically when optimized with Curriculum Learning (CL) and Hierarchical Label Smoothing (HLS), significantly outperforms simpler, flat classification methods. The inclusion of the "Type" prediction head proved critical, acting as a necessary semantic bridge to guide the feature extractor. This structured approach enforced strong taxonomic coherence, driving prediction consistency between Make and Model to $97.66\%$. Our final model, stabilized by Test Time Augmentation (TTA), achieved a Top-1 accuracy of $88.57\%$, confirming that for complex, fine-grained tasks, structuring the learning process is paramount to achieving robust and logically coherent predictions.
 \end{abstract}
 
 
@@ -121,7 +90,7 @@ Our approach follows a similar foundation in that we also rely on transfer learn
 	\item Hierarchical Label Definiton:
 \begin{table}[h!]
 \centering
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{Hierarchy Level} &
 \textbf{Description} &
@@ -148,7 +117,7 @@ Head 3: Model &
 \hline
 \end{tabular}
 \vspace{6pt}
-\caption{Table 1: Hierarchical Label Definition}
+\caption{Hierarchical Label Definition}
 \end{table}
 
 \end{itemize}
@@ -247,7 +216,7 @@ Organize results by "Research Question" rather than date.
 		
 \end{itemize}
 
-\subsection{SOTA Performance: Hierarchical Label Smoothing \& Learning Rate Scheduler}
+\subsection{SOTA Performance: Hierarchical Label Smoothing (HLS) \& Learning Rate Scheduler (LR Scheduler)}
 \begin{itemize}
 	\item \textbf{Objective:} Pushing the limit. 
 	\item \textbf{Data:} Present the final training model (Experiment 10) achieving 87.95\% Top-1 Accuracy. The Make-Model Consistency also improved from 96.60\% to 97.66\% and the Type-Model Consistency from 95.93\% to 96.58\%
@@ -263,65 +232,34 @@ Organize results by "Research Question" rather than date.
 		
 \end{itemize}
 
-
-\begin{table*}[t]
-\centering
-\caption{\textbf{Evolution of Model Performance.} Note specifically the comparison between the 2-Head Curriculum (Ablation) and 3-Head Curriculum (Phase 7), which highlights the necessity of the "Type" head to bridge the semantic gap.}
-\label{tab:ablation_study}
-\begin{tabular}{llccl}
-\toprule
-\textbf{Phase} & \textbf{Configuration} & \textbf{Acc (\%)} & \textbf{Consist. (\%)} & \textbf{Key Insight} \\
-\midrule
-\multicolumn{5}{l}{\textit{Baselines}} \\
-1 & Baseline (Frozen ResNet) & 41.72 & 100.0* & Baseline performance. \\
-2 & Fine-Tuned (Unfrozen) & 75.92 & 100.0* & Learned features, but ignored hierarchy. \\
-\midrule
-\multicolumn{5}{l}{\textit{Structural \& Data Improvements}} \\
-3 & Multi-Head (2-Head) & 77.20 & 90.44 & Structure helps (+1.3\%), but heads conflict. \\
-4 & + Data Augmentation & 85.65 & 95.26 & Robustness prevents overfitting (+8.4\%). \\
-5 & + Class Balancing & 86.02 & 94.42 & Improves rare classes; slight consistency drop. \\
-\midrule
-\multicolumn{5}{l}{\textit{Architectural Ablation (Is the 3rd Head necessary?)}} \\
-\textbf{5.5} & \textbf{2-Head + Curriculum} & \textbf{85.51} & 95.77 & \textbf{Semantic Gap:} Lacked "Body Type" bridge. \\
-6 & 3-Head (No Curriculum) & 85.36 & 94.44 & \textbf{Interference:} 3 tasks confused the backbone. \\
-7 & 3-Head (+ Curriculum) & 86.15 & 95.21 & \textbf{Synergy:} 3 heads + ordering $>$ 2 heads. \\
-\midrule
-\multicolumn{5}{l}{\textit{Final Optimization}} \\
-8 & + Hierarchical Label Smoothing & 86.48 & 96.60 & Soft targets teach family structure. \\
-9 & + LR Scheduler (Cosine) & 87.95 & \textbf{97.66} & Convergence into sharp minimum. \\
-\textbf{10} & \textbf{+ TTA (3 Augmentations)} & \textbf{88.57} & 97.64 & \textbf{Peak Performance.} \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
 \begin{table}[h!]
 \centering
 
 \begin{tabular}{|l|c|c|}
 \hline
-\textbf{Model} & \textbf{Top - 1} & \textbf{Top - 5} \\
+\textbf{Model} & \textbf{Top - 1 error rate} \\
 \hline
-Frozen Baseline & 58,28\% & 32,11\% \\
+Frozen Baseline & 58,28\%  \\
 \hline
-Unfrozen Baseline & 24,08\% & 8,72\% \\
+Unfrozen Baseline & 24,08\%  \\
 \hline
-Regularization and Class Balancing on 1 Head & 14,35\% & 2,03\% \\
+Regularization and Class Balancing on 1 Head & 14,35\%  \\
 \hline
-Data Augmentation and Class Balancing on 2 Head & 13,98\% & 2,03\% \\
+Data Augmentation and Class Balancing on 2 Head & 13,98\% \\
 \hline
-3 Head without Curriculum Learning & 14,64\% & 2,09\% \\
+3 Head without Curriculum Learning & 14,64\% \\
 \hline
-2 Head with Curriculum Learning & 14,49\% & 3,01\% \\
+2 Head with Curriculum Learning & 14,49\% \\
 \hline
-3 Head with Curriculum Learning & 13,85\% & 2,21\% \\
+3 Head with Curriculum Learning & 13,85\% \\
 \hline
-3 Head Hierarchical Label Smoothing and Learning Rate Scheduler & 12,05\% & 2,09\% \\
+3 Head Hierarchical Label Smoothing and Learning Rate Scheduler & 12,05\% \\
 \hline
-3 Head Test Time Augmentation & 11,43\% &  \\
+3 Head Test Time Augmentation & 11,43\% \\
 \hline
 \end{tabular}
 \vspace{6pt}
-\caption{Table 2: Top-1 and Top-5 error rates through experiments}
+\caption{Top-1 error rates through experiments}
 
 \end{table}
 
@@ -355,7 +293,7 @@ Our Model & ResNet-50 & 88,57\% \\
 \end{tabular}
 
 \vspace{6pt}
-\caption{Table 3: Compare accuracy to related benchmarks}
+\caption{Compare accuracy to related benchmarks}
 \end{table}
 
 
@@ -403,7 +341,13 @@ In our experiments, the TTA results demonstrated that the model maintained highl
 
 
 \section{Conclusion}
-Conclude that while ResNet50 is powerful, structuring the learning process (Curriculum) and enforcing taxonomy (Multi-head + HLS) creates a model that is not only more accurate but logically robust.
+The pursuit of fine-grained vehicle classification in this project demonstrated that while a powerful backbone like ResNet-50 is essential for feature extraction, overcoming the challenge of subtle visual differences requires more than just raw model capacity; it demands a structured learning methodology. Our initial single-head baseline, while functional, failed to capture the intrinsic make-type-model hierarchy.
+\newline
+The key to success lay in adopting the Shared-Bottom Multi-Task Learning architecture, specifically the three-head design. The "Type" head proved invaluable, acting as a semantic bridge that provided crucial intermediate scaffolding for the fine-grained "Model" prediction, resolving initial task interference when combined with Curriculum Learning.
+\newline
+Furthermore, the introduction of Hierarchical Label Smoothing (HLS) and a fine-tuned Learning Rate Scheduler were critical for squeezing out the final performance gains and enforcing logical coherence, driving prediction consistency to $97.66\%$ and virtually eliminating the "Frankenstein Car" problem.
+\newline
+Achieving a final Top-1 accuracy of $88.57\%$ (with TTA) validates that our strategy was sound. This project confirms that for complex, hierarchical tasks, structuring the learning process and enforcing taxonomy coherence is paramount, yielding a final model that is not only accurate but also highly resilient and logically robust against real-world variations.
 
 
 
