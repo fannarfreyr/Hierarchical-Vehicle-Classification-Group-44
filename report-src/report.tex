@@ -133,16 +133,11 @@ Head 3: Model &
  First we set up a baseline for training which contained batch size = 32 with 15 epochs and a 0.0001 learning rate, where the ImageNet layers were frozen and only the fully connected layer was unfrozen. Then we unfroze the rest of the model parameters, to help the model recognize the shapes of the elements of the car models. Then we added the Make classification head that only predicts the make of the car (fx. BMW) while the first head was predicting the full label to make sure that the model is learning the hierarchy. Then later we added a third, Type classification head that only predicts the type of the car (fx. Sedan)
 	
 \subsubsection*{Data Augmentation, Normalization}
-
-We added 4 different types of data augmentation and normalization
+We added 4 different types of data augmentation and normalization.
         Random Resized: and Cropped Images were first resized to a larger   dimension (256x256) and then a $224 \times 224$ area was randomly     cropped. This combination forces the model to learn features that are   robust to variations in position, scale, and perspective (i.e., the car   is not always perfectly centered).
-    
         Random Horizontal Flip: Flips the image along the vertical axis with a  50% probability, teaching the model to recognize features regardless of  their left-right orientation.
-    
         Random Rotation: Images were randomly rotated up to $\pm 15$ degrees.   This provides rotational invariance, which is particularly useful for     handling slight tilts or oblique angles in real-world images.
-    
         Color Jitter: Randomly alters the brightness, contrast, and saturation of   the images to make the model invariant to lighting conditions.
-    
         Normalization: Input images were normalized using the mean and standard deviation of the ImageNet dataset, matching the pre-training conditions of the ResNet backbone.
  
 \subsubsection*{Curriculum Learning}
