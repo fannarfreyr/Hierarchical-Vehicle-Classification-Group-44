@@ -141,11 +141,11 @@ We added 4 different types of data augmentation and normalization.
         Normalization: Input images were normalized using the mean and standard deviation of the ImageNet dataset, matching the pre-training conditions of the ResNet backbone.
  
 \subsubsection*{Curriculum Learning}
- We addressed curriculum learning with the 3 model head to make the model first learn easy (Make) and medium (Type) tasks before focusing on the hard (Model) task. To achieve it, we increased the number of epochs to 20 and in the 5 epochs, we froze the Model head, so it only trains on the Make and Type heads.
+ We addressed curriculum learning with the 3-model Head to make the model first learn easy (Make) and medium (Type) tasks before focusing on the hard (Model) task. To achieve it, we increased the number of epochs to 20 and in the 5 epochs, we froze the Model head, so it only trains on the Make and Type heads. \cite{chen2023taxonomic}
 	
 
 \subsubsection*{Hierarchical Label Smoothing}
-	While we were trying to squeeze out the last percentages of accuracy in training, we used HLS, to make the model penalize more the easy misses then the hard misses. Which means that for example mistaking a BMW M3 for a BMW 328i (Sibling error) shouln't give the same loss as mistaking a a BMW M3 for a Ford F-150 (Distant error). The technique we used for it is instead of a hard [0, 1, 0, 0] target, use soft targets that give partial credit to siblings. While the hard target gives 100\% loss for the correct car, while the soft targets give 90\% to the correct car and 10\% distributed among other cars in the same Make 
+	While we were trying to squeeze out the last percentages of accuracy in training, we used HLS, to make the model penalize more the easy misses then the hard misses. Which means that for example mistaking a BMW M3 for a BMW 328i (Sibling error) shouln't give the same loss as mistaking a a BMW M3 for a Ford F-150 (Distant error). The technique we used for it is instead of a hard [0, 1, 0, 0] target, use soft targets that give partial credit to siblings. While the hard target gives 100\% loss for the correct car, while the soft targets give 90\% to the correct car and 10\% distributed among other cars in the same Make. \cite{pham2020interpreting}
 
 
 \subsection{Inference Strategies:}
@@ -153,7 +153,7 @@ To evaluate the robustness of our model, we employ Test Time Augmentation (TTA) 
 
 $$\hat{y} = \text{argmax} \left( \frac{1}{2} (P(x) + P(flip(x))) \right)$$
 
-This approach exploits the model's learned invariance to geometric transformations (due to the data augmentation in Section 5.4) to stabilize and often improve final predictions. We assumed that it is going to slightly increase our accuracy during testing.
+This approach exploits the model's learned invariance to geometric transformations (due to the data augmentation in Section 5.4) to stabilize and often improve final predictions. We assumed that it is going to slightly increase our accuracy during testing. \cite{kim2020learning_loss_tta}
 
 \section{Results}
 Organize results by "Research Question" rather than date.
@@ -201,7 +201,7 @@ The objective was to solve the "Task Interference" problem inherent in the multi
 		
 
 \subsection{SOTA Performance: Hierarchical Label Smoothing (HLS) \& Learning Rate Scheduler (LR Scheduler):}
-	The ultimate goal was to push the model's predictive limits, leveraging the full benefit of the hierarchical structure. The data from the final optimized training run, Experiment 10, demonstrated significant results: it achieved a peak Top-1 Accuracy of 87.95\%. Crucially, the model's structural integrity improved further, with Make-Model Consistency rising from 96.60\% to 97.66\%, and Type-Model Consistency also increasing from 95.93\% to 96.58\%. This key finding shows that the combination of the Learning Rate Scheduler and Hierarchical Label Smoothing (HLS) was instrumental in driving the consistency metrics to their practical maximum.
+	The ultimate goal was to push the model's predictive limits, leveraging the full benefit of the hierarchical structure. The data from the final optimized training run, Experiment 10, demonstrated significant results: it achieved a peak Top-1 Accuracy of 87.95\%. Crucially, the model's structural integrity improved further, with Make-Model Consistency rising from 96.60\% to 97.66\%, and Type-Model Consistency also increasing from 95.93\% to 96.58\%. This key finding shows that the combination of the Learning Rate Scheduler and Hierarchical Label Smoothing (HLS) was instrumental in driving the consistency metrics to their practical maximum. \cite{basodi2020gradient_amplification}
 
 
 \subsection{The Impact of Inference Strategies (Test Time Augmentation (TTA)):}
