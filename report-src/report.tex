@@ -78,13 +78,16 @@ Building on this baseline, the primary objective of this project is to investiga
 After we evaluated these 3 variants, we will further enhance their performance using targeted regularization and optimization strategies. These include data augmentation, dropout, weight decay, and learning-rate adjustments, all of which can help reduce overfitting.
 
 \section{Related Work}
-Valev et al. investigate how modern convolutional neural networks perform on the Stanford Cars dataset.\cite{valev2018systematicevaluationrecentdeep} The authors evaluate several well-known CNN architectures, including ResNet-50. Their study focuses entirely on flat fine-grained classification. ResNet-50 is tested both when trained from scratch and when fine-tuned from ImageNet weights. Training ResNet-50 from scratch yields an accuracy of 84.3\%, whereas fine-tuning dramatically improves performance to 92.0\%. Their experiments highlight the importance of data augmentation such as horizontal flipping and motion blur, which add up to meaningful improvements.\newline
-Sánchez et al. explore the challenge of distinguishing highly similar car models within the Stanford Cars dataset by relying on transfer learning with a VGG-16 backbone pretrained on ImageNet.\cite{inbook} The experimental results show that the baseline VGG-16 achieves only 52.1\% accuracy on the test set, while the modified VGG-16 reaches a much stronger accuracy of 84.0\%. These findings demonstrate that fine-tuned CNN backbones, combined with aggressive augmentation can perform competitively on fine-grained vehicle recognition tasks. \newline
-Pham et al. discuss the advantages of HLS in improving model generalization by penalizing mistakes on related classes less severely.\cite{pham2020interpreting} Similarly, Chen et al. highlight the benefits of Curriculum Learning, where the model is trained progressively, starting with easier tasks before moving to more complex ones, helping to improve learning stability and performance.\cite{chen2023taxonomic} \newline
+Valev et al. investigate how modern convolutional neural networks perform on the Stanford Cars dataset.\cite{valev2018systematicevaluationrecentdeep} The authors evaluate several well-known CNN architectures, including ResNet-50. Their study focuses entirely on flat fine-grained classification. ResNet-50 is tested both when trained from scratch and when fine-tuned from ImageNet weights. Training ResNet-50 from scratch yields an accuracy of 84.3\%, whereas fine-tuning dramatically improves performance to 92.0\%. Their experiments highlight the importance of data augmentation such as horizontal flipping and motion blur, which add up to meaningful improvements.
+
+Sánchez et al. explore the challenge of distinguishing highly similar car models within the Stanford Cars dataset by relying on transfer learning with a VGG-16 backbone pretrained on ImageNet.\cite{inbook} The experimental results show that the baseline VGG-16 achieves only 52.1\% accuracy on the test set, while the modified VGG-16 reaches a much stronger accuracy of 84.0\%. These findings demonstrate that fine-tuned CNN backbones, combined with aggressive augmentation can perform competitively on fine-grained vehicle recognition tasks.
+
+Pham et al. discuss the advantages of HLS in improving model generalization by penalizing mistakes on related classes less severely.\cite{pham2020interpreting} Similarly, Chen et al. highlight the benefits of Curriculum Learning, where the model is trained progressively, starting with easier tasks before moving to more complex ones, helping to improve learning stability and performance.\cite{chen2023taxonomic} 
+
 Our approach follows a similar foundation as Valev et al. and Sánchez et al. in that we also rely on transfer learning, starting from a ResNet-50 backbone pretrained on ImageNet. However, instead of only treating the Stanford Cars dataset as a flat 196-class problem, we additionally explore hierarchical classification strategies. Concretely, we design and compare models with one, two, and three prediction heads, where each head independently predicts one of the hierarchical levels: make, type, and model. Additionally, our approach incorporates a broader set of regularization and stabilization techniques, such as data augmentation, dropout, weight decay, learning-rate scheduling, HLS, and Curriculum Learning. Finally, we also evaluate the impact of test-time augmentation (TTA). 
 
 \section{Methods}
-\subsection{Dataset and Pre-Processing??}
+\subsection{Dataset and Pre-Processing}
 
 	We used the Stanford Cars Dataset, which was introduced by Krause et al. and comprises a total of 16,185 images distributed across 196 distinct classes of automobiles.\cite{Krause2013CollectingAL} The dataset was divided almost evenly for training and testing: 8,144 images were designated for the training set, and the remaining 8,041 images formed the test set. Importantly, the split for each of the 196 car classes was maintained at approximately a 50-50 ratio between the training and testing partitions. We utilize the natural taxonomy of the dataset: Make (e.g., BMW), Type (e.g., Sedan), and Model (e.g., 3-Series 2012).
 
@@ -223,10 +226,14 @@ Our Model & ResNet-50 & 88,57\% \\
     \caption{Three Stanford-Cars test images and the five labels considered most probable by our model (3 heads, HLS, LRS). The correct label and the five labels considered most probable are written under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
     \label{fig:labels_pred}
 \end{figure}
-In Table 2, we observe different patterns of misclassification across the three samples. \newline
-The first sample demonstrates a case where the model is highly confident in its predictions for both the Make (98.86\%) and Type (92.64\%), despite both being incorrect. For the Model, the prediction is less clear, and the correct model does not even appear in the top-5 predictions. \newline
-The second sample illustrates a situation where the Make and Type are misclassified, but the Model is correctly predicted. The model shows moderate confidence in predicting the wrong Make, ranking the correct one as second most likely with 19.50\%. The Type is predicted incorrectly with higher confidence (90.59\%). However, the Model is correctly identified, albeit with a relatively low confidence of 26.50\%. \newline
-The final sample, featuring the Audi TTS, highlights a case where only the Make is predicted correctly. The Make ("Audi") is correctly predicted with 99.20\% confidence, while the correct Type is ranked second and the correct Model is fifth, with the Model prediction having only 4.17\% confidence. \newline
+In Table 2, we observe different patterns of misclassification across the three samples. 
+
+The first sample demonstrates a case where the model is highly confident in its predictions for both the Make (98.86\%) and Type (92.64\%), despite both being incorrect. For the Model, the prediction is less clear, and the correct model does not even appear in the top-5 predictions.
+
+The second sample illustrates a situation where the Make and Type are misclassified, but the Model is correctly predicted. The model shows moderate confidence in predicting the wrong Make, ranking the correct one as second most likely with 19.50\%. The Type is predicted incorrectly with higher confidence (90.59\%). However, the Model is correctly identified, albeit with a relatively low confidence of 26.50\%. 
+
+The final sample, featuring the Audi TTS, highlights a case where only the Make is predicted correctly. The Make ("Audi") is correctly predicted with 99.20\% confidence, while the correct Type is ranked second and the correct Model is fifth, with the Model prediction having only 4.17\% confidence.
+
 More samples for different cases of misclassifications and their top-5 predictions can be found in the appendix.
 
 \begin{figure}[ht!]
@@ -235,10 +242,14 @@ More samples for different cases of misclassifications and their top-5 predictio
     \caption{Three Stanford-Cars test images and the heatmaps showing on which image part our model (3 heads, HLS, LRS) focused on when producing labels for each head. The heatmaps for each head are displayed under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
     \label{fig:heatmap}
 \end{figure}
-In Figure 4, we can observe different heatmaps for three misclassification cases.\newline
-The first sample, where all heads produce incorrect labels, is taken from the side and rear perspective. It is evident that the model focuses, for each head, on the rear right side and the side of the car to generate the predictions. \newline
-The second sample is captured from the front-left side, where we can see that the Make head primarily focuses on a small area above the front left tire. The Type head, in contrast, concentrates on the driver's door and the door behind it, while the Model head focuses on the bonnet, grille, and again, the area above the front left tire. \newline
-In the Audi TTS example, where the image is taken from the rear, both the Make and Type heads fixate on the central region of the rear end. However, the Model head diverges significantly, focusing primarily on the left rear light and even the skyscrapers in the background. \newline
+In Figure 4, we can observe different heatmaps for three misclassification cases.
+
+The first sample, where all heads produce incorrect labels, is taken from the side and rear perspective. It is evident that the model focuses, for each head, on the rear right side and the side of the car to generate the predictions.
+
+The second sample is captured from the front-left side, where we can see that the Make head primarily focuses on a small area above the front left tire. The Type head, in contrast, concentrates on the driver's door and the door behind it, while the Model head focuses on the bonnet, grille, and again, the area above the front left tire. 
+
+In the Audi TTS example, where the image is taken from the rear, both the Make and Type heads fixate on the central region of the rear end. However, the Model head diverges significantly, focusing primarily on the left rear light and even the skyscrapers in the background.
+
 More samples for different cases of misclassifications and their heatmaps can be found in the appendix.
 
 \section{Discussion}
@@ -246,39 +257,42 @@ In the following section, we interpret the results of our project and critically
 
 \subsection{The "Frankenstein Car" Problem}
 
-A question in hierarchical classification is whether a model learns the underlying taxonomy or whether it simply memorizes pixel-level patterns without understanding the semantic relationships between labels. Early versions of our model frequently produced predictions where the make, type, and model belonged to different, incompatible vehicles. For example, the make head might output “Toyota”, while the model head simultaneously predicted “Honda Civic”. Such inconsistencies mean that each head is treated as an isolated classification task. \newline
-In the initial experiments, hierarchical consistency remained relatively low, hovering around 90\%, meaning that in roughly one out of ten images, the predicted model did not belong to the predicted make. By introducing Hierarchical Label Smoothing (HLS) the consistency improved substantially. By Experiment 9, the model reached 96.6\% consistency which demonstrates a marked improvement in aligning predictions across heads. The final experiment, which integrated both HLS and a cosine learning rate scheduler, further increased consistency to 97.66\%. \newline
+A question in hierarchical classification is whether a model learns the underlying taxonomy or whether it simply memorizes pixel-level patterns without understanding the semantic relationships between labels. Early versions of our model frequently produced predictions where the make, type, and model belonged to different, incompatible vehicles. For example, the make head might output “Toyota”, while the model head simultaneously predicted “Honda Civic”. Such inconsistencies mean that each head is treated as an isolated classification task.
+
+In the initial experiments, hierarchical consistency remained relatively low, hovering around 90\%, meaning that in roughly one out of ten images, the predicted model did not belong to the predicted make. By introducing Hierarchical Label Smoothing (HLS) the consistency improved substantially. By Experiment 9, the model reached 96.6\% consistency which demonstrates a marked improvement in aligning predictions across heads. The final experiment, which integrated both HLS and a cosine learning rate scheduler, further increased consistency to 97.66\%.
+
 This progression shows that the model was no longer merely fitting to visual textures or superficial cues but had begun to internalize the hierarchical taxonomy of make, type, and model. The reduction of incompatible predictions illustrates that the network learned meaningful relationships between car brands and their associated models which resulted in coherent outputs.
 
 
 
 \subsection{The Role of "Type" as Scaffolding}
 
-A key insight from our experiments is the importance of the “Type” head (e.g., Sedan, SUV, Coupe) as an intermediate level of supervision. When comparing the two-head curriculum (Make + Model) to the three-head setup (Make + Type + Model), the latter consistently achieved higher accuracy and stability. This is because Type acts as a bridge because it is easier to learn than the fine-grained model classification but more informative than the broad make category. \newline
-By giving the model an additional intermediate task, the network receives structured guidance that reduces the complexity of learning the full 196-class model label. The Type head therefore provides scaffolding that helps the model organize visual information hierarchically. This effect explains why the three-head curriculum outperformed the two-head version in both accuracy and consistency.
+A key insight from our experiments is the importance of the “Type” head (e.g., Sedan, SUV, Coupe) as an intermediate level of supervision. When comparing the two-head curriculum (Make + Model) to the three-head setup (Make + Type + Model), the latter consistently achieved higher accuracy and stability. This is because Type acts as a bridge because it is easier to learn than the fine-grained model classification but more informative than the broad make category.
 
+By giving the model an additional intermediate task, the network receives structured guidance that reduces the complexity of learning the full 196-class model label. The Type head therefore provides scaffolding that helps the model organize visual information hierarchically. This effect explains why the three-head curriculum outperformed the two-head version in both accuracy and consistency.
 
 
 \subsection{The "Free Lunch" of Training Schedules}
 
-Another finding was how strongly the learning-rate schedule influenced performance. After the architecture and curriculum strategy were already working well, switching to a learning-rate scheduler brought an additional improvement of roughly 1.5 percentage points without modifying the model or adding new data. \newline
+Another finding was how strongly the learning-rate schedule influenced performance. After the architecture and curriculum strategy were already working well, switching to a learning-rate scheduler brought an additional improvement of roughly 1.5 percentage points without modifying the model or adding new data. 
+
 This highlights that the model was already capable of achieving higher performance, but the optimizer was not navigating the loss landscape efficiently. The scheduler allowed the network to make larger exploratory steps early on and gradually settle into more stable minima toward the end of training. In that sense, learning-rate scheduling was a simple change that is responsible for additional accuracy while keeping training cost and model complexity unchanged.
 
 
 \subsection{Robustness via Inference Ensembling}
-Explain how TTA serves as a proxy for measuring model robustness, argue that this proves our model is robust and "production-ready"
 
-Test-time augmentation (TTA) provided an additional perspective on the robustness of the trained model. By averaging predictions over several augmented versions of each test image, such as horizontal flips or cropped resizes, the model effectively performs a lightweight ensembling step during inference. This reduces the influence of single-view biases, such as lighting, framing, or minor pose variations. \newline
+Test-time augmentation (TTA) provided an additional perspective on the robustness of the trained model. By averaging predictions over several augmented versions of each test image, such as horizontal flips or cropped resizes, the model effectively performs a lightweight ensembling step during inference. This reduces the influence of single-view biases, such as lighting, framing, or minor pose variations. 
+
 In our experiments, the TTA results demonstrated that the model maintained highly stable predictions under these perturbations which confirms that it had learned generalizable visual features rather than overfitting to specific image conditions. Although the absolute performance gain from TTA was modest, the consistency across augmented views indicates that the model is resilient and can be considered “production-ready” for real-world scenarios.
 
 
 \section{Conclusion}
 The pursuit of fine-grained vehicle classification in this project demonstrated that while a powerful backbone like ResNet-50 is essential for feature extraction, overcoming the challenge of subtle visual differences requires more than just raw model capacity; it demands a structured learning methodology. Our initial single-head baseline, while functional, failed to capture the intrinsic make-type-model hierarchy.
-\newline
+
 The key to success lay in adopting the Shared-Bottom Multi-Task Learning architecture, specifically the three-head design. The "Type" head proved invaluable, acting as a semantic bridge that provided crucial intermediate scaffolding for the fine-grained "Model" prediction, resolving initial task interference when combined with Curriculum Learning.
-\newline
+
 Furthermore, the introduction of Hierarchical Label Smoothing (HLS) and a fine-tuned Learning Rate Scheduler were critical for squeezing out the final performance gains and enforcing logical coherence, driving prediction consistency to $97.66\%$ and virtually eliminating the "Frankenstein Car" problem.
-\newline
+
 Achieving a final Top-1 accuracy of $88.57\%$ (with TTA) validates that our strategy was sound. This project confirms that for complex, hierarchical tasks, structuring the learning process and enforcing taxonomy coherence is paramount, yielding a final model that is not only accurate but also highly resilient and logically robust against real-world variations.
 
 \newpage{}
