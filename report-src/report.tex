@@ -92,14 +92,14 @@ Our approach follows a similar foundation as Valev et al. and Sánchez et al. in
 \subsection{Model Architecture}
 
     The core of the model is a ResNet-50 network, then the images are simultaneously fed into multiple, distinct "heads", where each head is responsible for its own classification task (e.g., Make, Model, or Type).
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/resnet-50-1.jpg}
     \caption{ResNet-50 architecture with 3 output heads}
-    \label{fig:my_image}
+    \label{fig:resnet}
 \end{figure}    
 Specifically, the Multi-Head Architecture utilizes this paradigm by taking theshared feature vector, $F_{shared}$, extracted by the backbone, and splitting it tofeed three independent, fully-connected (Dense) classification heads: Make, Type,and Model. This design enables the backbone to learn general, low-level visualcharacteristics common to all tasks, while each specific head refines the featuresneeded for its respective hierarchical classification level. The entire network istrained end-to-end by optimizing a single Combined Training Objective, $L_{Total}$.This total loss function is defined as the weighted sum of the Categorical CrossEntropy (CCE) losses ($L_{CCE}$) calculated from each head's prediction:
-$$L_{Total} = w_{Make} \cdot L_{CCE}(y_{Make}, \hat{y}_{Make}) + w_{Type} \cdotL_{CCE}(y_{Type}, \hat{y}_{Type}) + w_{Model} \cdot L_{CCE}(y_{Model},\hat{y}_{Model})$$
+$$L_{Total} = w_{Make} \cdot L_{CCE}(y_{Make}, \hat{y}_{Make}) + w_{Type} \cdot L_{CCE}(y_{Type}, \hat{y}_{Type}) + w_{Model} \cdot L_{CCE}(y_{Model}, \hat{y}_{Model})$$
 
 
 \subsection{Training Strategies}
@@ -217,11 +217,11 @@ Our Model & ResNet-50 & 88,57\% \\
 \end{table}
 
 \subsection{Qualitative evaluation}
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/label_prediction_3_samples.png}
     \caption{Three Stanford-Cars test images and the five labels considered most probable by our model (3 heads, HLS, LRS). The correct label and the five labels considered most probable are written under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
-    \label{fig:my_image}
+    \label{fig:labels_pred}
 \end{figure}
 In Table 2, we observe different patterns of misclassification across the three samples. \newline
 The first sample demonstrates a case where the model is highly confident in its predictions for both the Make (98.86\%) and Type (92.64\%), despite both being incorrect. For the Model, the prediction is less clear, and the correct model does not even appear in the top-5 predictions. \newline
@@ -229,11 +229,11 @@ The second sample illustrates a situation where the Make and Type are misclassif
 The final sample, featuring the Audi TTS, highlights a case where only the Make is predicted correctly. The Make ("Audi") is correctly predicted with 99.20\% confidence, while the correct Type is ranked second and the correct Model is fifth, with the Model prediction having only 4.17\% confidence. \newline
 More samples for different cases of misclassifications and their top-5 predictions can be found in the appendix.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/heatmap_3_samples.png}
     \caption{Three Stanford-Cars test images and the heatmaps showing on which image part our model (3 heads, HLS, LRS) focused on when producing labels for each head. The heatmaps for each head are displayed under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
-    \label{fig:my_image}
+    \label{fig:heatmap}
 \end{figure}
 In Figure 4, we can observe different heatmaps for three misclassification cases.\newline
 The first sample, where all heads produce incorrect labels, is taken from the side and rear perspective. It is evident that the model focuses, for each head, on the rear right side and the side of the car to generate the predictions. \newline
@@ -280,5 +280,11 @@ The key to success lay in adopting the Shared-Bottom Multi-Task Learning archite
 Furthermore, the introduction of Hierarchical Label Smoothing (HLS) and a fine-tuned Learning Rate Scheduler were critical for squeezing out the final performance gains and enforcing logical coherence, driving prediction consistency to $97.66\%$ and virtually eliminating the "Frankenstein Car" problem.
 \newline
 Achieving a final Top-1 accuracy of $88.57\%$ (with TTA) validates that our strategy was sound. This project confirms that for complex, hierarchical tasks, structuring the learning process and enforcing taxonomy coherence is paramount, yielding a final model that is not only accurate but also highly resilient and logically robust against real-world variations.
+
+\newpage{}
+\bibliographystyle{unsrtnat}
+\bibliography{references}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
+
+
 
 \end{document}
