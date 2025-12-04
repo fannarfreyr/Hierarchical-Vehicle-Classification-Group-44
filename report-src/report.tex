@@ -53,7 +53,6 @@ pdfkeywords={Fine-Grained Classification, Multi-Task Learning, ResNet, Hierarchi
 
 
 % keywords can be removed
-\keywords{First keyword \and Second keyword \and More}
 
 
 \section{Introduction}
@@ -64,7 +63,8 @@ In this project, we aim to explore and compare different strategies for hierarch
 
 Our baseline approach uses a ResNet-50 model pretrained on ImageNet as the backbone architecture. Initially, we treat the problem as a flat classification task by predicting the complete car label (containing make, type, and model) as a single class among 196 possible categories. This serves as our starting point for evaluating how well a standard single-head classifier performs on fine-grained classification without explicit hierarchical structure.
 
-Building on this baseline, the primary objective of this project is to investigate how different hierarchical output designs influence classification performance. Specifically, we focus on three classification strategies:
+Building on this baseline, the primary objective of this project is to investigate how different hierarchical output designs influence classification performance. We evaluate three output designs: a flat single-head classifier, a two-head classifier (Make, Model), and a three-head architecture (Make, Type, Model). This comparison allows us to determine the necessity of explicit multi-task supervision for learning the vehicle taxonomy. The final model is optimized using specific strategies like Curriculum Learning and Hierarchical Label Smoothing to ensure taxonomic coherence and maximize overall accuracy.
+
 
 \begin{enumerate}
     \item \textbf{Single-head (flat) classifier:}
@@ -87,82 +87,41 @@ Our approach follows a similar foundation as Valev et al. and Sánchez et al. in
 \subsection{Dataset and Pre-Processing??}
 
 	We used the Stanford Cars Dataset, which was introduced by Krause et al. and comprises a total of 16,185 images distributed across 196 distinct classes of automobiles.\cite{Krause2013CollectingAL} The dataset was divided almost evenly for training and testing: 8,144 images were designated for the training set, and the remaining 8,041 images formed the test set. Importantly, the split for each of the 196 car classes was maintained at approximately a 50-50 ratio between the training and testing partitions. We utilize the natural taxonomy of the dataset: Make (e.g., BMW), Type (e.g., Sedan), and Model (e.g., 3-Series 2012).
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Hierarchy Level} &
-\textbf{Description} &
-\textbf{Example} &
-\textbf{Classification Difficulty} \\
-\hline
-
-Head 1: Make &
-\begin{tabular}[c]{@{}c@{}}The manufacturer or brand of the vehicle.\\ This is the coarse-grained class.\end{tabular} &
-BMW &
-\begin{tabular}[c]{@{}c@{}}Easy \\ (Highly distinct features/logos)\end{tabular} \\
-\hline
-
-Head 2: Type &
-\begin{tabular}[c]{@{}c@{}}The general body style of the vehicle,\\ inferred from the model name.\end{tabular} &
-Sedan &
-\begin{tabular}[c]{@{}c@{}}Medium \\ (Defined by shape/proportions)\end{tabular} \\
-\hline
-
-Head 3: Model &
-\begin{tabular}[c]{@{}c@{}}The specific model and year of\\ the vehicle (the original 196 classes).\end{tabular} &
-3-Series Sedan 2012 &
-\begin{tabular}[c]{@{}c@{}}Hard \\ (Subtle visual differences)\end{tabular} \\
-\hline
-\end{tabular}
-\vspace{6pt}
-\caption{Hierarchical Label Definition}
-\end{table}
 
 
 \subsection{Model Architecture}
 
-    The core of the model is a ResNet-50 network, which serves as the backbone and was initialized using weights pre-trained on ImageNet without any subsequent architectural modifications. The overall Data Architecture is rooted in the Shared-Bottom Multi-Task Learning paradigm. This approach involves using the single Convolutional Neural Network (CNN) backbone to extract a universal, high-dimensional feature representation from the input image. This shared feature is then simultaneously fed into multiple, distinct "heads", where each head is responsible for its own classification task (e.g., Make, Model, or Type).
+    The core of the model is a ResNet-50 network, then the images are simultaneously fed into multiple, distinct "heads", where each head is responsible for its own classification task (e.g., Make, Model, or Type).
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/resnet-50-1.jpg}
     \caption{ResNet-50 architecture with 3 output heads}
     \label{fig:my_image}
-\end{figure}
-    
-    \newline Specifically, the Multi-Head Architecture utilizes this paradigm by taking the shared feature vector, $F_{shared}$, extracted by the backbone, and splitting it to feed three independent, fully-connected (Dense) classification heads: Make, Type, and Model. This design enables the backbone to learn general, low-level visual characteristics common to all tasks, while each specific head refines the features needed for its respective hierarchical classification level. The entire network is trained end-to-end by optimizing a single Combined Training Objective, $L_{Total}$. This total loss function is defined as the weighted sum of the Categorical Cross-Entropy (CCE) losses ($L_{CCE}$) calculated from each head's prediction:
-    $$L_{Total} = w_{Make} \cdot L_{CCE}(y_{Make}, \hat{y}_{Make}) + w_{Type} \cdot L_{CCE}(y_{Type}, \hat{y}_{Type}) + w_{Model} \cdot L_{CCE}(y_{Model}, \hat{y}_{Model})$$
+\end{figure}    
+Specifically, the Multi-Head Architecture utilizes this paradigm by taking theshared feature vector, $F_{shared}$, extracted by the backbone, and splitting it tofeed three independent, fully-connected (Dense) classification heads: Make, Type,and Model. This design enables the backbone to learn general, low-level visualcharacteristics common to all tasks, while each specific head refines the featuresneeded for its respective hierarchical classification level. The entire network istrained end-to-end by optimizing a single Combined Training Objective, $L_{Total}$.This total loss function is defined as the weighted sum of the Categorical CrossEntropy (CCE) losses ($L_{CCE}$) calculated from each head's prediction:
+$$L_{Total} = w_{Make} \cdot L_{CCE}(y_{Make}, \hat{y}_{Make}) + w_{Type} \cdotL_{CCE}(y_{Type}, \hat{y}_{Type}) + w_{Model} \cdot L_{CCE}(y_{Model},\hat{y}_{Model})$$
 
 
 \subsection{Training Strategies}
-\subsubsection*{Baseline}
- First we set up a baseline for training which contained batch size = 32 with 15 epochs and a 0.0001 learning rate, where the ImageNet layers were frozen and only the fully connected layer was unfrozen. Then we unfroze the rest of the model parameters, to help the model recognize the shapes of the elements of the car models. Then we added the Make classification head that only predicts the make of the car (fx. BMW) while the first head was predicting the full label to make sure that the model is learning the hierarchy. Then later we added a third, Type classification head that only predicts the type of the car (fx. Sedan)
-	
-\subsubsection*{Data Augmentation, Normalization} 
-We added 4 different types of data augmentation and normalization.
-        Random Resized: and Cropped Images were first resized to a larger   dimension (256x256) and then a $224 \times 224$ area was randomly     cropped. This combination forces the model to learn features that are   robust to variations in position, scale, and perspective (i.e., the car   is not always perfectly centered).
-        Random Horizontal Flip: Flips the image along the vertical axis with a  50% probability, teaching the model to recognize features regardless of  their left-right orientation.
-        Random Rotation: Images were randomly rotated up to $\pm 15$ degrees.   This provides rotational invariance, which is particularly useful for     handling slight tilts or oblique angles in real-world images.
-        Color Jitter: Randomly alters the brightness, contrast, and saturation of   the images to make the model invariant to lighting conditions.
-        Normalization: Input images were normalized using the mean and standard deviation of the ImageNet dataset, matching the pre-training conditions of the ResNet backbone.
- 
+All models utilized a batch size of 32 and were trained using the Adam optimizer with a base learning rate of $0.0001$. Training typically ran for 20 epochs. The ResNet-50 backbone, initialized with ImageNet weights, had all its layers unfrozen to allow for end-to-end fine-tuning across all experiments. The multi-head architectures (two-head and three-head) employed Categorical Cross-Entropy (CCE) loss for each head, combined into a weighted total loss function, $L_{Total}$, as defined in the Model Architecture section.
+
+\subsubsection*{Data Augmentation, Normalization}
+To improve generalization and robustness against real-world variance, we applied standard augmentations to the training set. These included: Random Resized Crop ($224 \times 224$ from an initial $256 \times 256$ dimension), Random Horizontal Flip ($p=0.5$), Random Rotation ($\pm 15^{\circ}$), and Color Jitter. Input images were normalized using the ImageNet mean and standard deviation.
+
 \subsubsection*{Curriculum Learning}
- We addressed curriculum learning with the 3-model Head to make the model first learn easy (Make) and medium (Type) tasks before focusing on the hard (Model) task. To achieve it, we increased the number of epochs to 20 and in the 5 epochs, we froze the Model head, so it only trains on the Make and Type heads. \cite{chen2023taxonomic}
-	
+To mitigate task interference between the easy (Make) and hard (Model) tasks, we implemented a Curriculum Learning strategy on the three-head architecture. Training was structured to prioritize the simpler tasks first: during the initial 5 epochs, the Model prediction head was frozen. This allowed the shared backbone to learn stable, general features guided primarily by the Make and Type heads, before introducing the complexity of the fine-grained Model task.
 
-\subsubsection*{Hierarchical Label Smoothing}
-	While we were trying to squeeze out the last percentages of accuracy in training, we used HLS, to make the model penalize more the easy misses then the hard misses. Which means that for example mistaking a BMW M3 for a BMW 328i (Sibling error) shouln't give the same loss as mistaking a a BMW M3 for a Ford F-150 (Distant error). The technique we used for it is instead of a hard [0, 1, 0, 0] target, use soft targets that give partial credit to siblings. While the hard target gives 100\% loss for the correct car, while the soft targets give 90\% to the correct car and 10\% distributed among other cars in the same Make. \cite{pham2020interpreting}
+\subsubsection*{Hierarchical Label Smoothing (HLS)}
+To enforce taxonomic coherence and regularize the prediction space, we implemented Hierarchical Label Smoothing (HLS). This technique replaces the standard hard target vector with soft targets that distribute a portion of the true label's probability mass to closely related (sibling) classes within the same hierarchy level (Make or Type). This ensures that predictions closer to the ground truth in the taxonomy (e.g., confusing two models of the same Make) incur a lower loss penalty than predictions far from the ground truth (e.g., confusing two different Makes). Specifically, we assign $90\%$ confidence to the correct Model class and distribute the remaining $10\%$ among other Model classes belonging to the correct Make.
 
-
-\subsection{Inference Strategies:}
-To evaluate the robustness of our model, we employ Test Time Augmentation (TTA) during the inference phase. Standard inference utilizes a single center crop of the input image. In contrast, our TTA protocol averages the softmax probability distributions of $N=2$ views: the original image ($x$) and a horizontally flipped version ($flip(x)$). The final prediction $\hat{y}$ is computed as:
-
-$$\hat{y} = \text{argmax} \left( \frac{1}{2} (P(x) + P(flip(x))) \right)$$
-
-This approach exploits the model's learned invariance to geometric transformations (due to the data augmentation in Section 5.4) to stabilize and often improve final predictions. We assumed that it is going to slightly increase our accuracy during testing. \cite{kim2020learning_loss_tta}
-
+\subsection{Inference Strategies}
+To evaluate the robustness of our final model and maximize performance, we employed Test Time Augmentation (TTA) during the inference phase. Our TTA protocol averages the softmax probability distributions of $N = 2$ views: the original image ($x$) and a horizontally flipped version ($flip(x)$). The final prediction $\hat{y}$ is computed as:
+$$
+\hat{y} = \text{argmax} \left( \frac{1}{2} (P(x) + P(flip(x))) \right)
+$$
+This approach exploits the model’s learned feature invariance to stabilize and often improve final predictions by mitigating view-specific noise.
 \section{Results}
-Organize results by "Research Question" rather than date.
+
 
 \subsection{Establishing the "Hierarchy Gap" (Baselines)}
 
@@ -172,30 +131,10 @@ Organize results by "Research Question" rather than date.
 \subsection{The Impact of Regularization \& Class Balancing}
 
 	The objective here was to solve the overfitting problem. This was demonstrated using the data to show a significant jump from approximately 75.92\% accuracy (observed in Phase 3) to 85.65\% accuracy (achieved in Phase 4) simply by adding Data Augmentation. The key observation is that we gained nearly 10\% accuracy on the hardest classification task without needing to change the model architecture or train the model for a longer duration. This finding clearly demonstrates why Data Augmentation is a standard practice in Deep Learning: it effectively converts model "memorization" into robust "generalization."
-\begin{figure}[h!]
-    \centering
-    
-    % Left image
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]
-        {Images/Multihead_two_heads_loss_curve.png}
-        \caption*{Without Data Augmentation}
-    \end{minipage}
-    \hfill
-    % Right image
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{Images/Multihead_two_heads_with_data_augmentation_loss_curve.png}
-        \caption*{With Data Augmentation}
-    \end{minipage}
-
-\end{figure}
-
 
 \subsection{Data Augmentation and Class Balancing on 2 Head (Model, Make}
 
-	The primary goal of this stage was to enhance the model's performance specifically on the more rare classes. An analysis of the data revealed the impact of implementing class balancing: initially, the two-head model with Data Augmentation achieved 85.65\% accuracy on the Model Head and 92.71\% accuracy on the Make Head. After applying class balancing, the Model Head saw a modest increase to 86.02\%, while the Make Head accuracy slightly decreased to 91.77\%. The central observation is that while Class Balancing provided a distinct benefit to the infrequently occurring classes, it came at the cost of a minor reduction in overall consistency—an effect that can be likened to a "Robin Hood" dynamic, where resources are shifted from common to rare groups.
+	The primary goal of this stage was to enhance the model's performance specifically on the more rare classes. An analysis of the data revealed the impact of implementing class balancing: initially, the two-head model with Data Augmentation  on the Model Head acvieved 92.71\% accuracy on the Make Head. After applying class balancing, the Model Head saw a modest increase to 86.02\%, while the Make Head accuracy slightly decreased to 91.77\%. The central observation is that while Class Balancing provided a distinct benefit to the infrequently occurring classes, it came at the cost of a minor reduction in overall consistency—an effect that can be likened to a "Robin Hood" dynamic, where resources are shifted from common to rare groups.
 
 
 \subsection{Optimization Dynamics: Interference vs. Curriculum}
@@ -203,11 +142,11 @@ Organize results by "Research Question" rather than date.
 The objective was to solve the "Task Interference" problem inherent in the multi-task learning setup. This was demonstrated using data that contrasts Experiment 6 (the 3-Head model trained without Curriculum Learning, achieving 85.36\% accuracy) against Experiment 7 (the 3-Head model trained with Curriculum Learning, which yielded 86.15\% accuracy). The key finding is that, without the phased approach of Curriculum Learning, the gradients from the competing tasks conflicted within the shared backbone.	
 
 \subsection{Architectural Ablation: The Necessity of "Type"}
-	The objective was to demonstrate the necessity of the architectural layers. Data comparing Experiment 8 (2-Head Curriculum: 85.51\%) against the optimized Experiment 9/10 (Final 3-Head: 87.95\%) showed a clear advantage. The key finding is that while the 3-Head approach initially struggled, once optimized, it consistently surpassed the 2-Head model. This confirms that the "Type" layer is required, serving as a necessary semantic bridge.
+	To assess the structural necessity of the "Type" head, we compared the **2-Head Curriculum model** (Experiment 5.5, $85.51\%$ accuracy) against the optimized **3-Head model trained with Curriculum Learning**. The difference in performance showed a clear advantage for the 3-Head architecture, improving Model-head accuracy by **+0.64 percentage points** ($86.15\%$). This result confirms that the intermediate "Type" layer is required, serving as a necessary semantic bridge that guides the feature extraction process.
 		
 
 \subsection{SOTA Performance: Hierarchical Label Smoothing (HLS) \& Learning Rate Scheduler (LR Scheduler):}
-	The ultimate goal was to push the model's predictive limits, leveraging the full benefit of the hierarchical structure. The data from the final optimized training run, Experiment 10, demonstrated significant results: it achieved a peak Top-1 Accuracy of 87.95\%. Crucially, the model's structural integrity improved further, with Make-Model Consistency rising from 96.60\% to 97.66\%, and Type-Model Consistency also increasing from 95.93\% to 96.58\%. This key finding shows that the combination of the Learning Rate Scheduler and Hierarchical Label Smoothing (HLS) was instrumental in driving the consistency metrics to their practical maximum. \cite{basodi2020gradient_amplification}
+	The ultimate goal was to push the model's predictive limits, leveraging the full benefit of the hierarchical structure. The data from the final optimized training run, Experiment 10, demonstrated significant results: it achieved a peak Top-1 Accuracy of 87.95\%. Crucially, the model's structural integrity improved further, with Make-Model Consistency rising from 96.60\% to 97.66\%, and Type-Model Consistency also increasing from 95.93\% to 96.58\%. This key finding shows that the combination of the Learning Rate Scheduler and Hierarchical Label Smoothing (HLS) was instrumental in driving the consistency metrics to their practical maximum.
 
 
 \subsection{The Impact of Inference Strategies (Test Time Augmentation (TTA)):}
@@ -284,7 +223,7 @@ Our Model & ResNet-50 & 88,57\% \\
     \caption{Three Stanford-Cars test images and the five labels considered most probable by our model (3 heads, HLS, LRS). The correct label and the five labels considered most probable are written under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
     \label{fig:my_image}
 \end{figure}
-In Figure 3, we observe different patterns of misclassification across the three samples. \newline
+In Table 2, we observe different patterns of misclassification across the three samples. \newline
 The first sample demonstrates a case where the model is highly confident in its predictions for both the Make (98.86\%) and Type (92.64\%), despite both being incorrect. For the Model, the prediction is less clear, and the correct model does not even appear in the top-5 predictions. \newline
 The second sample illustrates a situation where the Make and Type are misclassified, but the Model is correctly predicted. The model shows moderate confidence in predicting the wrong Make, ranking the correct one as second most likely with 19.50\%. The Type is predicted incorrectly with higher confidence (90.59\%). However, the Model is correctly identified, albeit with a relatively low confidence of 26.50\%. \newline
 The final sample, featuring the Audi TTS, highlights a case where only the Make is predicted correctly. The Make ("Audi") is correctly predicted with 99.20\% confidence, while the correct Type is ranked second and the correct Model is fifth, with the Model prediction having only 4.17\% confidence. \newline
@@ -306,11 +245,7 @@ More samples for different cases of misclassifications and their heatmaps can be
 In the following section, we interpret the results of our project and critically examine the factors that shaped the model’s performance. We outline which components of our approach contributed meaningfully to improvements and where limitations were faced.
 
 \subsection{The "Frankenstein Car" Problem}
-\begin{itemize}
-	\item Discuss Hierarchical Consistency.
-	\item In early experiments, consistency was low (~90\%). The model would predict "Toyota" (Make) and "Honda Civic" (Model).
-	\item By Experiment 9 (HLS), consistency reached 96.6\%, and finally 97.66\% with the scheduler. This proves the model learned the taxonomy, not just pixel patterns.
-\end{itemize}
+
 A question in hierarchical classification is whether a model learns the underlying taxonomy or whether it simply memorizes pixel-level patterns without understanding the semantic relationships between labels. Early versions of our model frequently produced predictions where the make, type, and model belonged to different, incompatible vehicles. For example, the make head might output “Toyota”, while the model head simultaneously predicted “Honda Civic”. Such inconsistencies mean that each head is treated as an isolated classification task. \newline
 In the initial experiments, hierarchical consistency remained relatively low, hovering around 90\%, meaning that in roughly one out of ten images, the predicted model did not belong to the predicted make. By introducing Hierarchical Label Smoothing (HLS) the consistency improved substantially. By Experiment 9, the model reached 96.6\% consistency which demonstrates a marked improvement in aligning predictions across heads. The final experiment, which integrated both HLS and a cosine learning rate scheduler, further increased consistency to 97.66\%. \newline
 This progression shows that the model was no longer merely fitting to visual textures or superficial cues but had begun to internalize the hierarchical taxonomy of make, type, and model. The reduction of incompatible predictions illustrates that the network learned meaningful relationships between car brands and their associated models which resulted in coherent outputs.
@@ -318,21 +253,15 @@ This progression shows that the model was no longer merely fitting to visual tex
 
 
 \subsection{The Role of "Type" as Scaffolding}
-\begin{itemize}
-	\item Analyze why 3\_head\_curriculum eventually beat 2\_head\_curriculum.
-	\item The "Type" head (Sedan, SUV, Coupe) provides Intermediate Scaffolding. It is easier to learn than "Model" but provides more structural information than "Make." It bridges the semantic gap.
-\end{itemize}
+
 A key insight from our experiments is the importance of the “Type” head (e.g., Sedan, SUV, Coupe) as an intermediate level of supervision. When comparing the two-head curriculum (Make + Model) to the three-head setup (Make + Type + Model), the latter consistently achieved higher accuracy and stability. This is because Type acts as a bridge because it is easier to learn than the fine-grained model classification but more informative than the broad make category. \newline
 By giving the model an additional intermediate task, the network receives structured guidance that reduces the complexity of learning the full 196-class model label. The Type head therefore provides scaffolding that helps the model organize visual information hierarchically. This effect explains why the three-head curriculum outperformed the two-head version in both accuracy and consistency.
 
 
 
 \subsection{The "Free Lunch" of Training Schedules}
-\begin{itemize}
-	\item Discuss the final experiment (LR Scheduler).
-	\item ou gained ~1.5\% accuracy (87.9\% $\to$ 89.07\%) just by changing the learning rate schedule. This indicates the architecture was sound, but the optimizer needed "fine-grained" control to settle into the sharp minima of the loss landscape.
-\end{itemize}
-Another finding was how strongly the learning-rate schedule influenced performance. After the architecture and curriculum strategy were already working well, switching to a learning-rate scheduler brought an additional improvement of roughly 1.5 percentage points (from ~87.9\% to 89.07\% model accuracy) without modifying the model or adding new data. \newline
+
+Another finding was how strongly the learning-rate schedule influenced performance. After the architecture and curriculum strategy were already working well, switching to a learning-rate scheduler brought an additional improvement of roughly 1.5 percentage points without modifying the model or adding new data. \newline
 This highlights that the model was already capable of achieving higher performance, but the optimizer was not navigating the loss landscape efficiently. The scheduler allowed the network to make larger exploratory steps early on and gradually settle into more stable minima toward the end of training. In that sense, learning-rate scheduling was a simple change that is responsible for additional accuracy while keeping training cost and model complexity unchanged.
 
 
@@ -351,114 +280,5 @@ The key to success lay in adopting the Shared-Bottom Multi-Task Learning archite
 Furthermore, the introduction of Hierarchical Label Smoothing (HLS) and a fine-tuned Learning Rate Scheduler were critical for squeezing out the final performance gains and enforcing logical coherence, driving prediction consistency to $97.66\%$ and virtually eliminating the "Frankenstein Car" problem.
 \newline
 Achieving a final Top-1 accuracy of $88.57\%$ (with TTA) validates that our strategy was sound. This project confirms that for complex, hierarchical tasks, structuring the learning process and enforcing taxonomy coherence is paramount, yielding a final model that is not only accurate but also highly resilient and logically robust against real-world variations.
-
-
-
-
-
-\section{Headings: first level}
-\label{sec:headings}
-
-\lipsum[4] See Section \ref{sec:headings}.
-
-\subsection{Headings: second level}
-\lipsum[5]
-\begin{equation}
-	\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
-\end{equation}
-
-\subsubsection{Headings: third level}
-\lipsum[6]
-
-\paragraph{Paragraph}
-\lipsum[7]
-
-
-
-\section{Examples of citations, figures, tables, references}
-\label{sec:others}
-
-\subsection{Citations}
-Citations use \verb+natbib+. The documentation may be found at
-\begin{center}
-	\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-
-Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
-
-\subsection{Figures}
-\lipsum[10]
-See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
-\lipsum[11]
-
-\begin{figure}
-	\centering
-	\fbox{\rule[-.5cm]{4cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-	\caption{Sample figure caption.}
-	\label{fig:fig1}
-\end{figure}
-
-\subsection{Tables}
-See awesome Table~\ref{tab:table}.
-
-The documentation for \verb+booktabs+ (`Publication quality tables in LaTeX') is available from:
-\begin{center}
-	\url{https://www.ctan.org/pkg/booktabs}
-\end{center}
-
-
-\begin{table}
-	\caption{Sample table title}
-	\centering
-	\begin{tabular}{lll}
-		\toprule
-		\multicolumn{2}{c}{Part}                   \\
-		\cmidrule(r){1-2}
-		Name     & Description     & Size ($\mu$m) \\
-		\midrule
-		Dendrite & Input terminal  & $\sim$100     \\
-		Axon     & Output terminal & $\sim$10      \\
-		Soma     & Cell body       & up to $10^6$  \\
-		\bottomrule
-	\end{tabular}
-	\label{tab:table}
-\end{table}
-
-\subsection{Lists}
-\begin{itemize}
-	\item Lorem ipsum dolor sit amet
-	\item consectetur adipiscing elit.
-	\item Aliquam dignissim blandit est, in dictum tortor gravida eget. In ac rutrum magna.
-\end{itemize}
-
-
-\bibliographystyle{unsrtnat}
-\bibliography{references}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
-
-
-%%% Uncomment this section and comment out the \bibliography{references} line above to use inline references.
-% \begin{thebibliography}{1}
-
-% 	\bibitem{kour2014real}
-% 	George Kour and Raid Saabne.
-% 	\newblock Real-time segmentation of on-line handwritten arabic script.
-% 	\newblock In {\em Frontiers in Handwriting Recognition (ICFHR), 2014 14th
-% 			International Conference on}, pages 417--422. IEEE, 2014.
-
-% 	\bibitem{kour2014fast}
-% 	George Kour and Raid Saabne.
-% 	\newblock Fast classification of handwritten on-line arabic characters.
-% 	\newblock In {\em Soft Computing and Pattern Recognition (SoCPaR), 2014 6th
-% 			International Conference of}, pages 312--318. IEEE, 2014.
-
-% 	\bibitem{hadash2018estimate}
-% 	Guy Hadash, Einat Kermany, Boaz Carmeli, Ofer Lavi, George Kour, and Alon
-% 	Jacovi.
-% 	\newblock Estimate and replace: A novel approach to integrating deep neural
-% 	networks with existing applications.
-% 	\newblock {\em arXiv preprint arXiv:1804.09028}, 2018.
-
-% \end{thebibliography}
-
 
 \end{document}
