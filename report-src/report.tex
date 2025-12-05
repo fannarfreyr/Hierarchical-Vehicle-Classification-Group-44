@@ -36,7 +36,7 @@ pdfkeywords={Fine-Grained Classification, Multi-Task Learning, ResNet, Hierarchi
 \title{Hierarchical Vehicle Classification with Multi-Task Learning}
 
 \author{
-    Jónuson Fannar Freyr \thanks{Department of Computer Science, Aarhus University} \\
+    Fannar Freyr Jónuson \thanks{Department of Computer Science, Aarhus University} \\
     \and 
     Jenrik Engels \footnotemark[1] \\
     \and
@@ -208,7 +208,7 @@ Curriculum Learning proved essential for resolving the optimization conflicts in
     \label{fig:labels_pred}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\linewidth]{Images/heatmap_3_samples.png}
     \caption{Grad-CAM attention maps. Note the distinct focus of the heads: The Make head (top row) attends to global shapes and grilles, while the Model head (bottom row) focuses on fine-grained trim details like lights and wheels.}
@@ -219,7 +219,7 @@ Figures \ref{fig:labels_pred} and \ref{fig:heatmap} illustrate the distinct beha
 
 In contrast, Sample 3 (Figure \ref{fig:labels_pred}, right) demonstrates the success of the hierarchical constraints. The Make head identifies "Audi" with near-certainty ($99.2\%$), preventing an egregious cross-brand error. The error is isolated to the Model head, which struggles to differentiate the specific "TTS Coupe" trim from similar Audi frames. The heatmaps (Figure \ref{fig:heatmap}) further confirm that the heads have learned orthogonal features: the Make head consistently attends to brand identifiers (logos, grilles), while the Model head focuses on fine-grained details (headlights, bumpers), occasionally drifting to background noise in high-uncertainty scenarios.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/label_prediction_mis_make_type_wrong.png}
     \caption{Analysis of error modes. All samples represent the case of predicting the make and type wrong.}
