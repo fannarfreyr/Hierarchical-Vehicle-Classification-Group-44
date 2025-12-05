@@ -3,7 +3,7 @@ Fannar Freyr Jónuson:
 
 Jendrik Engels:
 In terms of model implementation, I developed multiple variants of Test-Time Augmentation (TTA). 
-For the project, I was responsible for writing multiple sections, including the Introduction, Related Work, Qualitative Evaluation, and Discussion. 
+For the project report, I was responsible for writing multiple sections, including the Introduction, Related Work, Qualitative Evaluation, and Discussion. 
 I conducted part of the literature research, finding the most relevant findings to support these sections.
 Additionally, I designed graphics to visually represent the model architecture, featuring three fully connected output heads. 
 I also created visualizations for the Qualitative Evaluation, showcasing misclassified car samples, their Top-5 predictions, and the corresponding heatmaps.
