@@ -229,41 +229,24 @@ Figures \ref{fig:labels_pred} and \ref{fig:heatmap} illustrate the distinct beha
 
 In contrast, Sample 3 (Figure \ref{fig:labels_pred}, right) demonstrates the success of the hierarchical constraints. The Make head identifies "Audi" with near-certainty ($99.2\%$), preventing an egregious cross-brand error. The error is isolated to the Model head, which struggles to differentiate the specific "TTS Coupe" trim from similar Audi frames. The heatmaps (Figure \ref{fig:heatmap}) further confirm that the heads have learned orthogonal features: the Make head consistently attends to brand identifiers (logos, grilles), while the Model head focuses on fine-grained details (headlights, bumpers), occasionally drifting to background noise in high-uncertainty scenarios.
 
-\subsection{Qualitative evaluation}
-\begin{figure}[ht!]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{Images/label_prediction_3_samples.png}
-    \caption{Three Stanford-Cars test images and the five labels considered most probable by our model (3 heads, HLS, LRS). The correct label and the five labels considered most probable are written under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
-    \label{fig:labels_pred}
+    \includegraphics[width=0.95\linewidth]{Images/label_prediction_mis_make_type_wrong.png}
+    \caption{Analysis of error modes. All samples represent the case of predicting the make and type wrong.}
+    \label{fig:label_preds_mis_make_type_wrong}
 \end{figure}
 
-
-
-In Table 2, we observe different patterns of misclassification across the three samples. 
-
-The first sample demonstrates a case where the model is highly confident in its predictions for both the Make (98.86\%) and Type (92.64\%), despite both being incorrect. For the Model, the prediction is less clear, and the correct model does not even appear in the top-5 predictions.
-
-The second sample illustrates a situation where the Make and Type are misclassified, but the Model is correctly predicted. The model shows moderate confidence in predicting the wrong Make, ranking the correct one as second most likely with 19.50\%. The Type is predicted incorrectly with higher confidence (90.59\%). However, the Model is correctly identified, albeit with a relatively low confidence of 26.50\%. 
-
-The final sample, featuring the Audi TTS, highlights a case where only the Make is predicted correctly. The Make ("Audi") is correctly predicted with 99.20\% confidence, while the correct Type is ranked second and the correct Model is fifth, with the Model prediction having only 4.17\% confidence.
-
-More samples for different cases of misclassifications and their top-5 predictions can be found in the appendix.
-
-\begin{figure}[ht!]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{Images/heatmap_3_samples.png}
-    \caption{Three Stanford-Cars test images and the heatmaps showing on which image part our model (3 heads, HLS, LRS) focused on when producing labels for each head. The heatmaps for each head are displayed under each image. First sample: Make wrong, Type wrong, Model wrong. Second sample: Make wrong, Type wrong, Model correct. Third sample: Make correct, Type wrong, Model wrong}
-    \label{fig:heatmap}
+    \includegraphics[width=0.95\linewidth]{Images/heatmap_mis_make_type_wrong.png}
+    \caption{Grad-CAM attention maps. All samples represent the case of predicting the make and type wrong}
+    \label{fig:heatmap_mis_make_type_wrong}
 \end{figure}
-In Figure 4, we can observe different heatmaps for three misclassification cases.
 
-The first sample, where all heads produce incorrect labels, is taken from the side and rear perspective. It is evident that the model focuses, for each head, on the rear right side and the side of the car to generate the predictions.
+Figure \ref{fig:label_preds_mis_make_type_wrong} illustrates additional cases where the model misclassifies both the make and type, but correctly predicts the model. In these samples, the model still assigns a relatively high probability to the correct label, even though it is not considered the most likely. The true type is also ranked second in all cases, but with a very low probability, ranging from 0.74\% to a maximum of 28.08\%.
 
-The second sample is captured from the front-left side, where we can see that the Make head primarily focuses on a small area above the front left tire. The Type head, in contrast, concentrates on the driver's door and the door behind it, while the Model head focuses on the bonnet, grille, and again, the area above the front left tire. 
+Figure \ref{fig:heatmap_mis_make_type_wrong} further confirms that the model first focuses on Make identifiers, while the other heads concentrate on finer details.
 
-In the Audi TTS example, where the image is taken from the rear, both the Make and Type heads fixate on the central region of the rear end. However, the Model head diverges significantly, focusing primarily on the left rear light and even the skyscrapers in the background.
-
-More samples for different cases of misclassifications and their heatmaps can be found in the appendix.
 
 \section{Discussion}
 In the following section, we interpret the results of our project and critically examine the factors that shaped the model’s performance. We outline which components of our approach contributed meaningfully to improvements and where limitations were faced.
