@@ -183,7 +183,7 @@ Curriculum Learning proved essential for resolving the optimization conflicts in
 
 \subsection{Compare our results to other benchmarks:}
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \caption{Comparison with state-of-the-art benchmarks.}
 \begin{tabular}{llc}
@@ -201,14 +201,14 @@ Curriculum Learning proved essential for resolving the optimization conflicts in
 
 \subsection{Qualitative Evaluation}
 
-\begin{figure}[t]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\linewidth]{Images/label_prediction_3_samples.png}
     \caption{Analysis of error modes. Sample 1 represents a total classification failure due to viewpoint. Sample 3 demonstrates a "near-miss" where the hierarchy is correct (Audi), but the specific trim is ambiguous.}
     \label{fig:labels_pred}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.9\linewidth]{Images/heatmap_3_samples.png}
     \caption{Grad-CAM attention maps. Note the distinct focus of the heads: The Make head (top row) attends to global shapes and grilles, while the Model head (bottom row) focuses on fine-grained trim details like lights and wheels.}
@@ -219,7 +219,7 @@ Figures \ref{fig:labels_pred} and \ref{fig:heatmap} illustrate the distinct beha
 
 In contrast, Sample 3 (Figure \ref{fig:labels_pred}, right) demonstrates the success of the hierarchical constraints. The Make head identifies "Audi" with near-certainty ($99.2\%$), preventing an egregious cross-brand error. The error is isolated to the Model head, which struggles to differentiate the specific "TTS Coupe" trim from similar Audi frames. The heatmaps (Figure \ref{fig:heatmap}) further confirm that the heads have learned orthogonal features: the Make head consistently attends to brand identifiers (logos, grilles), while the Model head focuses on fine-grained details (headlights, bumpers), occasionally drifting to background noise in high-uncertainty scenarios.
 
-\begin{figure}[t]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.95\linewidth]{Images/label_prediction_mis_make_type_wrong.png}
     \caption{Analysis of error modes. All samples represent the case of predicting the make and type wrong.}
@@ -228,6 +228,7 @@ In contrast, Sample 3 (Figure \ref{fig:labels_pred}, right) demonstrates the suc
 
 Figure \ref{fig:label_preds_mis_make_type_wrong} illustrates additional cases where the model misclassifies both the make and type, but correctly predicts the model. In these samples, the model still assigns a relatively high probability to the correct label, even though it is not considered the most likely. The true type is also ranked second in all cases, but with a very low probability, ranging from 0.74\% to a maximum of 28.08\%.
 
+\newpage{}
 \section{Discussion}
 In the following section, we interpret the results of our project and critically examine the factors that shaped the model’s performance. We outline which components of our approach contributed meaningfully to improvements and where limitations were faced.
 
