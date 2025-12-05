@@ -62,17 +62,7 @@ In this project, we aim to explore and compare different strategies for hierarch
 
 Our baseline approach uses a ResNet-50 model pretrained on ImageNet as the backbone architecture. Initially, we treat the problem as a flat classification task by predicting the complete car label (containing make, type, and model) as a single class among 196 possible categories. This serves as our starting point for evaluating how well a standard single-head classifier performs on fine-grained classification without explicit hierarchical structure.
 
-Building on this baseline, the primary objective of this project is to investigate how different hierarchical output designs influence classification performance. We evaluate three output designs: a flat single-head classifier, a two-head classifier (Make, Model), and a three-head architecture (Make, Type, Model). This comparison allows us to determine the necessity of explicit multi-task supervision for learning the vehicle taxonomy. The final model is optimized using specific strategies like Curriculum Learning and Hierarchical Label Smoothing to ensure taxonomic coherence and maximize overall accuracy.
-
-
-\begin{enumerate}
-    \item \textbf{Single-head (flat) classifier:}
-    Predicts the entire label (make, type, and model) as one combined class. This ignores the hierarchical relationships.
-    \item \textbf{Two-head classifier:}
-    One head predicts the vehicle make, while the second head predicts the combined type+model label. 
-    \item \textbf{Three-head classifier:}
-    Predicts make, type, and model independently using three parallel classification heads.
-\end{enumerate}   
+Building on this baseline, the primary objective of this project is to investigate how different hierarchical output designs influence classification performance. To assess the necessity of explicit multi-task supervision, we evaluate three distinct output architectures: (1) a \textbf{Single-head (flat) classifier} that predicts the 196 combined classes directly, ignoring hierarchical relationships; (2) a \textbf{Two-head classifier} that separates the coarse vehicle Make from the fine-grained Model prediction; and (3) a \textbf{Three-head classifier} that explicitly disentangles the taxonomy by independently predicting Make, Type, and Model via parallel classification heads.
 
 After we evaluated these 3 variants, we will further enhance their performance using targeted regularization and optimization strategies. These include data augmentation, dropout, weight decay, and learning-rate adjustments, all of which can help reduce overfitting.
 
