@@ -58,7 +58,7 @@ pdfkeywords={Fine-Grained Classification, Multi-Task Learning, ResNet, Hierarchi
 
 Fine-grained vehicle classification, which differentiates between various types, makes, and models of cars, presents significant challenges. This difficulty arises from the large number of visually similar vehicle categories, variations in lighting and weather conditions, occlusions, and the diverse viewpoints from which vehicles may be captured. As a result, building a robust vehicle classification system requires a model capable of recognizing subtle visual cues while generalizing across highly variable real-world conditions.
 
-In this project, we aim to explore and compare different strategies for hierarchical image classification on the Stanford Cars Dataset (\cite{Krause2013CollectingAL}). The dataset contains 16,185 high-resolution images labeled with three hierarchical attributes: vehicle make, vehicle type, and vehicle model. These labels naturally form a multi-level taxonomy, making the dataset well-suited for studying hierarchical classification approaches.
+In this project, we aim to explore and compare different strategies for hierarchical image classification on the Stanford Cars Dataset (\cite{Krause2013CollectingAL}). The dataset contains 16,185 high-resolution images labeled with three hierarchical attributes: vehicle Make, vehicle Type, and vehicle Model. These labels naturally form a multi-level taxonomy, making the dataset well-suited for studying hierarchical classification approaches.
 
 Our baseline approach uses a ResNet-50 model pretrained on ImageNet as the backbone architecture. Initially, we treat the problem as a flat classification task by predicting the complete car label (containing make, type, and model) as a single class among 196 possible categories. This serves as our starting point for evaluating how well a standard single-head classifier performs on fine-grained classification without explicit hierarchical structure.
 
@@ -107,11 +107,14 @@ To mitigate task interference between the easy (Make) and hard (Model) tasks, we
 To enforce taxonomic coherence and regularize the prediction space, we implemented Hierarchical Label Smoothing (HLS). This technique replaces the standard hard target vector with soft targets that distribute a portion of the true label's probability mass to closely related (sibling) classes within the same hierarchy level (Make or Type). This ensures that predictions closer to the ground truth in the taxonomy (e.g., confusing two models of the same Make) incur a lower loss penalty than predictions far from the ground truth (e.g., confusing two different Makes). Specifically, we assign $90\%$ confidence to the correct Model class and distribute the remaining $10\%$ among other Model classes belonging to the correct Make.
 
 \subsection{Inference Strategies}
-To evaluate the robustness of our final model and maximize performance, we employed Test Time Augmentation (TTA) during the inference phase. Our TTA protocol averages the softmax probability distributions of $N = 2$ views: the original image ($x$) and a horizontally flipped version ($flip(x)$). The final prediction $\hat{y}$ is computed as:
+To evaluate the robustness of our final model and maximize performance, we employed Test Time Augmentation (TTA) during the inference phase.
+Our TTA protocol averages the softmax probability distributions of $N = 4$ views: the original image ($x$), a horizontally flipped version ($x_{flip}$), and two rotated versions ($x_{rot+15^{\circ}}$ and $x_{rot-15^{\circ}}$).
+The final prediction $\hat{y}$ is computed as the average of the probabilities across these augmented views:
 $$
-\hat{y} = \text{argmax} \left( \frac{1}{2} (P(x) + P(flip(x))) \right)
+\hat{y} = \text{argmax} \left( \frac{1}{4} \left( P(x) + P(x_{flip}) + P(x_{rot+15^{\circ}}) + P(x_{rot-15^{\circ}}) \right) \right)
 $$
 This approach exploits the model’s learned feature invariance to stabilize and often improve final predictions by mitigating view-specific noise.
+
 \section{Results}
 
 
