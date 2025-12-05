@@ -88,12 +88,12 @@ Test Set Size: 8041
 ----------------------------------------
 3. THE GAP:                    11.09% points
 
-### Gemini thoughts on accuracy above
-1. Exact Accuracy (42%): This is your floor. Your model is getting less than half of the cars right.
+### Notes for the report
+1. Exact Accuracy (42%): This is the floor. The model is getting less than half of the cars right.
 
 2. Make Accuracy (53%): This is surprisingly low. It means that nearly half the time, the model doesn't even know it's looking at a "BMW" vs. a "Ford."
 
-3. The Gap (11%): This proves your hypothesis: Hierarchy matters. The model is significantly better at the "Easy" task (Make) than the "Hard" task (Model), but because you are using a standard flat classifier, it isn't effectively leveraging the easy task to help solve the hard one.
+3. The Gap (11%): This proves the hypothesis: Hierarchy matters. The model is significantly better at the "Easy" task (Make) than the "Hard" task (Model), but because we are using a standard flat classifier, it isn't effectively leveraging the easy task to help solve the hard one.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -196,8 +196,8 @@ Test Set Size: 8041
 ----------------------------------------
 3. THE GAP:                    9.56% points
 
-### Notes from Gemini
-This is a textbook result for your report. You have successfully created a strong narrative:
+### Notes for report
+This is a textbook result for the report:
 
 1. Phase 1 (Frozen): Acc ~42%. The model was blind to specific features.
 
@@ -312,10 +312,10 @@ Test Set Size: 8041
 3. THE GAP:                8.31% points
 4. Internal Consistency:   90.44% (How often heads agree)
 
-### Notes from Gemini
+### Notes for report
 
-1. Why did Exact Accuracy go up? (75.9% $\to$ 77.2%) By forcing the model to answer "What Brand is this?", you gave the shared backbone (the ResNet feature extractor) a strong hint. It learned features that are distinct to specific brands (like BMW grilles or Porsche headlights) which helped the specific Car classifier do its job better. This is called Auxiliary Task Learning.
-2. Why is Consistency only 90%? This is the "Frankenstein Problem." In ~9.5% of your test set (approx. 760 images), your model is confused.Head 1 says: "This is a Toyota."Head 2 says: "This is a Honda Civic."Currently, your loss function (loss_make + loss_model) treats these as separate problems. It doesn't strictly punish the model for disagreeing with itself.
+1. Why did Exact Accuracy go up? (75.9% $\to$ 77.2%) By forcing the model to answer "What Brand is this?", we gave the shared backbone (the ResNet feature extractor) a strong hint. It learned features that are distinct to specific brands (like BMW grilles or Porsche headlights) which helped the specific Car classifier do its job better. This is called Auxiliary Task Learning.
+2. Why is Consistency only 90%? This is the "Frankenstein Problem." In ~9.5% of the test set (approx. 760 images), the model is confused.Head 1 says: "This is a Toyota."Head 2 says: "This is a Honda Civic."Currently, the loss function (loss_make + loss_model) treats these as separate problems. It doesn't strictly punish the model for disagreeing with itself.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -423,10 +423,10 @@ Test Set Size: 8041
 4. Internal Consistency:   95.26% (How often heads agree)
 
 
-### Notes from Gemini
+### Notes for report
 1. The "Ceiling" was Shattered (Make Acc: 85% $\to$ 92%)Remember how in Phase 3 we were worried that "Make Accuracy" was stuck at 85%?Hypothesis: We thought the ResNet backbone had hit its capacity.Correction: It wasn't capacity; it was overfitting. The model had memorized the "clean" images perfectly but failed on slight variations. Data Augmentation forced it to learn robust features (like the shape of a grille regardless of angle), which instantly unlocked that extra 7% accuracy.
-2. The "Free Lunch" (Model Acc: +8.45%)You gained nearly 8.5% accuracy on the hardest task without changing your architecture or training longer. This demonstrates why Data Augmentation is standard practice in Deep Learning: it converts "memorization" into "generalization."
-3. Consistency Improved Automatically (90% $\to$ 95%)Interestingly, your consistency error was cut in half (from ~10% to ~5%).Why? When the model is more confident and robust about the image features, its two heads naturally agree more often. The "confused" cases (where Head 1 says Ford and Head 2 says Civic) usually happen on "weird" images. Augmentation made the model less confused by "weird" images.
+2. The "Free Lunch" (Model Acc: +8.45%): We gained nearly 8.5% accuracy on the hardest task without changing the architecture or training longer. This demonstrates why Data Augmentation is standard practice in Deep Learning: it converts "memorization" into "generalization."
+3. Consistency Improved Automatically (90% $\to$ 95%)Interestingly, the consistency error was cut in half (from ~10% to ~5%).Why? When the model is more confident and robust about the image features, its two heads naturally agree more often. The "confused" cases (where Head 1 says Ford and Head 2 says Civic) usually happen on "weird" images. Augmentation made the model less confused by "weird" images.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -533,12 +533,12 @@ Test Set Size: 8041
 3. THE GAP:                5.75% points
 4. Internal Consistency:   94.42% (How often heads agree)
 
-### Notes from Gemini
-The Trade-off Analysis (Crucial for your Report)
-You might notice that while your Model Accuracy went up (85.65% $\to$ 86.02%), your Make Accuracy and Consistency actually dropped slightly.
+### Notes for report
+The Trade-off Analysis (Crucial for the Report)
+We might notice that while the Model Accuracy went up (85.65% $\to$ 86.02%), the Make Accuracy and Consistency actually dropped slightly.
 Why did this happen?This is the "Robin Hood Effect" of Class Balancing.
     - Before: The model ignored rare cars to maximize its score on common cars (like Fords and Toyotas). Since Fords are easy to recognize, consistency was high.
-    - After: You forced the model to care about rare cars (like a "Spyker"). These are harder to recognize. By paying attention to them, the model takes more risks, leading to a slight drop in "easy" consistency but a net gain in "hard" truth.
+    - After: We forced the model to care about rare cars (like a "Spyker"). These are harder to recognize. By paying attention to them, the model takes more risks, leading to a slight drop in "easy" consistency but a net gain in "hard" truth.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -649,15 +649,15 @@ Test Set Size: 8041
 Make-Gap:  6.58%
 Type-Gap:   7.70%
 
-### Notes from Gemini
+### Notes for report
 
-1. The "Task Interference" PhenomenonYour Hard Accuracy (Model) dropped slightly: 86.02% $\to$ 85.36%.
-    - Why? You added a third boss (the "Type" head). Now the ResNet backbone is trying to satisfy three different masters at the same time from Epoch 0.
+1. The "Task Interference" Phenomenon Hard Accuracy (Model) dropped slightly: 86.02% $\to$ 85.36%.
+    - Why? We added a third boss (the "Type" head). Now the ResNet backbone is trying to satisfy three different masters at the same time from Epoch 0.
     - The Conflict: The gradients from the "Type" loss are pulling the weights one way (focus on shape), while the "Make" loss pulls another (focus on logos/grilles), and the "Model" loss pulls a third. This "noise" early in training prevented the backbone from fine-tuning the Model features as perfectly as before.
 2. The "Type" Hypothesis was Correct
-    Your Type Accuracy (93.06%) is higher than your Make Accuracy (91.94%).
+    The Type Accuracy (93.06%) is higher than the Make Accuracy (91.94%).
     - Interpretation: It is easier for the model to see that a car is a "Sedan" (Type) than to see it is a "Ford" (Make).
-    - Strategic Value: This proves that "Type" is the perfect Intermediate Scaffolding. If you teach the model "Type" first (via Curriculum Learning), you build a massive, stable foundation of features that the "Model Head" can later use to get that score back above 86%.
+    - Strategic Value: This proves that "Type" is the perfect Intermediate Scaffolding. If we teach the model "Type" first (via Curriculum Learning), we build a massive, stable foundation of features that the "Model Head" can later use to get that score back above 86%.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -773,22 +773,22 @@ Test Set Size: 8041
 Make-Gap:  6.33%
 Type-Gap:   6.67%
 
-### Notes from Gemini
+### Notes for report
 1. Proof of Concept: Curriculum Learning Works
 - Without Curriculum (Phase 6): Model Accuracy was 85.36%. The backbone was confused by trying to learn 3 tasks at once ("Interference").
 
 - With Curriculum (Phase 7): Model Accuracy is 86.15%.
 
-- The Gain: You squeezed out +0.79% accuracy purely by changing the order of training.
+- The Gain: we squeezed out +0.79% accuracy purely by changing the order of training.
 
-- Conclusion: By freezing the Model Head for 5 epochs, you forced the backbone to become an expert at "Shapes" (Type) and "Brands" (Make) first. When you finally turned on the Model Head, it didn't have to learn features from scratch; it just had to learn how to combine the high-quality Shape and Brand features it already had.
+- Conclusion: By freezing the Model Head for 5 epochs, we forced the backbone to become an expert at "Shapes" (Type) and "Brands" (Make) first. When we finally turned on the Model Head, it didn't have to learn features from scratch; it just had to learn how to combine the high-quality Shape and Brand features it already had.
 
 2. High Consistency
-- Your Make-Model Consistency (95.21%) and Type-Model Consistency (95.98%) are exceptionally high.
+- The Make-Model Consistency (95.21%) and Type-Model Consistency (95.98%) are exceptionally high.
 
-- This means your model is "thinking" logically. It almost never predicts "Convertible" and "Ford F-150" at the same time.
+- This means the model is "thinking" logically. It almost never predicts "Convertible" and "Ford F-150" at the same time.
 
-- This is a strong qualitative argument for your Master's defense: Your model isn't just accurate; it is chemically consistent.
+- The model isn't just accurate; it is chemically consistent.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -900,9 +900,8 @@ Test Set Size: 8041
 3. THE GAP:                6.64% points
 4. Internal Consistency:   95.77% (How often heads agree)
 
-### Notes from Gemini
+### Notes for report
 
-The Analysis for Your Report
 "Why didn't the 2-Head Curriculum work as well?" The 2-Head model hits a "semantic gap."
 
 - Jumping from "Brand" (Make) to "Specific Trim" (Model) is a big leap.
@@ -1025,12 +1024,12 @@ Test Set Size: 8041
 Make-Gap:  6.31%
 Type-Gap:   7.39%
 
-### Notes from Gemini
+### Notes for report
 This result proves the hypothesis we discussed earlier: Hierarchical Label Smoothing (HLS) doesn't just improve accuracy; it improves logic.
 
 - Consistency Jump: Look at Make-Model Consistency. It jumped from ~95.2% (Phase 7) to 96.60% (Phase 8).
 
-- Interpretation: By using soft targets, you punished the model less for "near misses" (e.g., mistaking a BMW 328i for a BMW M3). This relaxed the gradients for within-family confusion, allowing the model to focus its energy on fixing the "egregious errors" (mistaking a BMW for a Ford). The result is a model that "thinks" more like a human taxonomy.
+- Interpretation: By using soft targets, we punished the model less for "near misses" (e.g., mistaking a BMW 328i for a BMW M3). This relaxed the gradients for within-family confusion, allowing the model to focus its energy on fixing the "egregious errors" (mistaking a BMW for a Ford). The result is a model that "thinks" more like a human taxonomy.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
@@ -1156,11 +1155,11 @@ Test Set Size: 8041
 Make-Gap:  6.12%
 Type-Gap:   6.96%
 
-### Notes from Gemini 
+### Notes for report
 Key Analysis Points
- - The Scheduler Effect (+1.5%): By using Cosine Annealing over 30 epochs, you allowed the model to fine-tune its weights with microscopic precision in the final epochs. Notice how Make Accuracy jumped to 94%—the model finally perfected the "easy" features, which gave it the confidence to nail the "hard" features.
+ - The Scheduler Effect (+1.5%): By using Cosine Annealing over 30 epochs, we allowed the model to fine-tune its weights with microscopic precision in the final epochs. Notice how Make Accuracy jumped to 94%—the model finally perfected the "easy" features, which gave it the confidence to nail the "hard" features.
 
- - Consistency is Solved (97.66%): Your model is now almost perfectly logical. It rarely makes "stupid" mistakes (like calling a Ford a Toyota). This justifies the complexity of the 3-Head architecture.
+ - Consistency is Solved (97.66%): The model is now almost perfectly logical. It rarely makes "stupid" mistakes (like calling a Ford a Toyota). This justifies the complexity of the 3-Head architecture.
 
 The Gap is Closed:
 
@@ -1168,7 +1167,7 @@ The Gap is Closed:
 
  - End: Gap is 6.12%.
 
- - You have successfully transferred knowledge from the parent class to the child class.
+ - We have successfully transferred knowledge from the parent class to the child class.
 
 ### Notes
 Training finished. Logged curves, confusion matrix, sample image.
