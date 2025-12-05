@@ -1,4 +1,6 @@
 Fannar Freyr Jónuson:
+In terms of model implementation, I developed the most of the code for the model setup, training loop, and the model evaluation. I performed most of the training experiments: baseline (frozen), fine-tuned (unfrozen), 2-head, 2-head + Data Augmentation, 2-head + DA + Class Balancing, 3-head, 3-head + curriculum learning, 2-head + curriculum learning, 3-head + HLS, 3-head + LRS.
+For the project report, I was responsible for revising, and discussing possible changes to be made to text the others wrote.
 
 
 Jendrik Engels:
